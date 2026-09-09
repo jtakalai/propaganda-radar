@@ -1,17 +1,17 @@
 """
 Scrape headlines from one site's RSS feed and label them by hand.
 
-    pip install feedparser
-    python label.py
+    pip install feedparser deep-translator
+    python label.py              # headlines only
+    python label.py --translate  # also show an English gloss (Google Translate)
 
 Labels are appended to labels.csv as you go, so quitting never loses work.
 Headlines you've already labelled are skipped on the next run.
 """
 
+import argparse
 import csv
 import os
-
-import feedparser
 
 
 FEED = "https://www.kurir.rs/rss/politika"  # politics section only; check in a browser first
@@ -43,6 +43,26 @@ def save(rows):
         w.writerows(rows)
 
 
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument(
+    "--translate",
+    action="store_true",
+    help="show an English gloss of each headline via Google Translate",
+)
+args = parser.parse_args()
+
+translate = None
+if args.translate:
+    from deep_translator import GoogleTranslator
+
+    def translate(text):
+        try:
+            return GoogleTranslator(source="sr", target="en").translate(text)
+        except Exception as e:  # network down, rate limit, etc.
+            return f"(translation failed: {e})"
+
+import feedparser
+
 feed = feedparser.parse(FEED)
 if not feed.entries:
     raise SystemExit(f"No entries from {FEED} — check the URL in a browser.")
@@ -61,6 +81,8 @@ counts = {}
 try:
     for i, entry in enumerate(todo, 1):
         print(f"[{i}/{len(todo)}] {entry.title}")
+        if translate:
+            print(f"    en: {translate(entry.title)}")
         while True:
             key = input("> ").strip().lower()
             if key == "q":
