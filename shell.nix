@@ -15,5 +15,6 @@ pkgs.mkShell {
     python3Packages.scipy
     python3Packages.scikit-learn
     python3Packages.nltk
+    python3Packages.feedparser
   ];
 }
