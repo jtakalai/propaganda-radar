@@ -34,13 +34,13 @@ def already_labelled():
         return {row["headline"] for row in csv.DictReader(f)}
 
 
-def save(rows):
+def save(row):
     new_file = not os.path.exists(OUT)
     with open(OUT, "a", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=["outlet", "date", "headline", "label", "url"])
         if new_file:
             w.writeheader()
-        w.writerows(rows)
+        w.writerow(row)
 
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -75,7 +75,6 @@ for k, v in BUCKETS.items():
     print(f"  {k} = {v}")
 print("  s = skip    q = quit\n")
 
-buffer = []
 counts = {}
 
 try:
@@ -92,7 +91,7 @@ try:
             if key in BUCKETS:
                 label = BUCKETS[key]
                 counts[label] = counts.get(label, 0) + 1
-                buffer.append(
+                save(
                     {
                         "outlet": OUTLET,
                         "date": entry.get("published", ""),
@@ -101,16 +100,12 @@ try:
                         "url": entry.get("link", ""),
                     }
                 )
-                if len(buffer) >= 5:
-                    save(buffer)
-                    buffer = []
                 break
             print("  ? use 0-4, s, or q")
         print()
-except KeyboardInterrupt:
+except (KeyboardInterrupt, EOFError):
     print("\nstopping")
 
-save(buffer)
 print(f"\nsaved to {OUT}")
 for label, n in sorted(counts.items(), key=lambda x: -x[1]):
     print(f"  {n:3d}  {label}")
