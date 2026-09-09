@@ -11,7 +11,9 @@ Headlines you've already labelled are skipped on the next run.
 
 import argparse
 import csv
+import datetime
 import os
+import random
 
 
 FEED = "https://www.kurir.rs/rss/politika"  # politics section only; check in a browser first
@@ -34,6 +36,19 @@ def already_labelled():
         return {row["headline"] for row in csv.DictReader(f)}
 
 
+def entry_date(entry):
+    """Publish date as YYYY-MM-DD; fall back to today if the feed omits it."""
+    t = entry.get("published_parsed") or entry.get("updated_parsed")
+    if t:
+        return f"{t.tm_year:04d}-{t.tm_mon:02d}-{t.tm_mday:02d}"
+    return datetime.date.today().isoformat()
+
+
+def entry_url(entry):
+    """Article link; fall back to the guid, then the feed URL."""
+    return entry.get("link") or entry.get("id") or FEED
+
+
 def save(row):
     new_file = not os.path.exists(OUT)
     with open(OUT, "a", encoding="utf-8", newline="") as f:
@@ -48,6 +63,11 @@ parser.add_argument(
     "--translate",
     action="store_true",
     help="show an English gloss of each headline via Google Translate",
+)
+parser.add_argument(
+    "--random",
+    action="store_true",
+    help="label in random order instead of feed order",
 )
 args = parser.parse_args()
 
@@ -69,6 +89,8 @@ if not feed.entries:
 
 seen = already_labelled()
 todo = [e for e in feed.entries if e.title not in seen]
+if args.random:
+    random.shuffle(todo)
 
 print(f"{len(feed.entries)} headlines, {len(todo)} unlabelled\n")
 for k, v in BUCKETS.items():
@@ -80,6 +102,7 @@ counts = {}
 try:
     for i, entry in enumerate(todo, 1):
         print(f"[{i}/{len(todo)}] {entry.title}")
+        print(f"    {entry_url(entry)}")
         if translate:
             print(f"    en: {translate(entry.title)}")
         while True:
@@ -94,10 +117,10 @@ try:
                 save(
                     {
                         "outlet": OUTLET,
-                        "date": entry.get("published", ""),
+                        "date": entry_date(entry),
                         "headline": entry.title,
                         "label": label,
-                        "url": entry.get("link", ""),
+                        "url": entry_url(entry),
                     }
                 )
                 break
