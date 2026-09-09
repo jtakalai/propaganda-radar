@@ -14,7 +14,7 @@ import os
 import feedparser
 
 
-FEED = "https://www.kurir.rs/rss/vesti"  # check this in a browser first
+FEED = "https://www.kurir.rs/rss/politika"  # politics section only; check in a browser first
 OUTLET = "Kurir"
 OUT = "labels.csv"
 
