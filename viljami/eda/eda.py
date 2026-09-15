@@ -10,8 +10,6 @@ pd.set_option("display.width", 120)
 pd.set_option("display.max_columns", None)
 
 DATA = Path(__file__).resolve().parent.parent / "data"
-FIGURES = Path(__file__).resolve().parent / "figures"
-FIGURES.mkdir(exist_ok=True)
 
 # --- palette (fixed order, not cycled - see propaganda-radar dataviz notes) ---
 INK = "#0b0b0b"
@@ -56,25 +54,42 @@ def colors_for(labels):
     return [LABEL_COLORS.get(l, INK_MUTED) for l in labels]
 
 
-# --- load ---
-crta = pd.read_csv(DATA / "crta_examples.csv", parse_dates=["date"])
-labels = pd.read_csv(DATA / "labels.csv", parse_dates=["date"])
+def load_data():
+    """
+    Every labelled source we have, keyed by name. To add a new one (e.g. a
+    teammate's file), add one line here - everything below reads from this
+    dict, so nothing else needs to change.
+    """
+    return {
+        "labels": pd.read_csv(DATA / "labels.csv", parse_dates=["date"]),
+        "crta_examples": pd.read_csv(DATA / "crta_examples.csv", parse_dates=["date"]),
+        "llm_labels": pd.read_csv(DATA / "llm_labels.csv", parse_dates=["date"]),
+    }
+
+
+data = load_data()
+labels = data["labels"]  # hand-labelled, verified
+crta = data["crta_examples"]  # CRTA's own examples, verified, has cluster_id
+llm = data["llm_labels"]  # Claude-labelled, NOT verified - see confidence column
 
 print("=" * 60)
 print("LOAD")
 print("=" * 60)
-print(
-    f"crta_examples.csv : {len(crta)} outlet-rows, {crta['cluster_id'].nunique()} distinct headlines"
-)
-print(
-    f"labels.csv        : {len(labels)} rows (manual RSS labelling, all Kurir so far)"
-)
-print(
-    f"date range (crta)   : {crta['date'].min().date()} .. {crta['date'].max().date()}"
-)
-print(
-    f"date range (labels) : {labels['date'].min().date()} .. {labels['date'].max().date()}"
-)
+print(f"labels.csv        : {len(labels)} rows (verified)")
+print(f"crta_examples.csv : {len(crta)} outlet-rows, {crta['cluster_id'].nunique()} distinct headlines (verified)")
+print(f"llm_labels.csv     : {len(llm)} rows (NOT verified - Claude's guesses)")
+
+
+def all_headlines():
+    """crta (deduped to one row per story) + llm (unverified) + labels.csv,
+    combined for analyses where extra volume matters more than clean
+    provenance. Keep this in mind before reading too much into results here -
+    a third of it hasn't been checked by a person."""
+    crta_dedup = crta.drop_duplicates("cluster_id")[["headline", "label"]]
+    return pd.concat(
+        [crta_dedup, llm[["headline", "label"]], labels[["headline", "label"]]],
+        ignore_index=True,
+    )
 
 
 def class_balance():
@@ -83,27 +98,22 @@ def class_balance():
     print("1. CLASS BALANCE")
     print("=" * 60)
 
-    print(
-        "\ncrta_examples.csv, by distinct headline (not outlet-row, so repeats don't inflate this):"
-    )
+    print("\ncrta_examples.csv, by distinct headline (not outlet-row, so repeats don't inflate this):")
     print(crta_by_cluster["label"].value_counts())
 
-    print(
-        "\nlabels.csv (n is tiny - 1 outlet, 1 week - not representative of base rate yet):"
-    )
+    print("\nlabels.csv (verified, still small):")
     print(labels["label"].value_counts())
 
-    fig, axes = plt.subplots(1, 2, figsize=(10, 4))
-    for ax, (title, counts) in zip(
-        axes,
-        [
-            (
-                "CRTA examples\n(by distinct headline)",
-                crta_by_cluster["label"].value_counts(),
-            ),
-            ("Our labels.csv", labels["label"].value_counts()),
-        ],
-    ):
+    print("\nllm_labels.csv (NOT verified - Claude's guesses, check before trusting):")
+    print(llm["label"].value_counts())
+
+    fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+    panels = [
+        ("CRTA examples\n(by distinct headline)", crta_by_cluster["label"].value_counts()),
+        ("labels.csv\n(verified)", labels["label"].value_counts()),
+        ("llm_labels.csv\n(NOT verified)", llm["label"].value_counts()),
+    ]
+    for ax, (title, counts) in zip(axes, panels):
         counts = counts.reindex([l for l in LABEL_ORDER if l in counts.index])
         ax.bar(counts.index, counts.values, color=colors_for(counts.index))
         ax.set_title(title, color=INK, fontsize=11)
@@ -118,17 +128,13 @@ def class_balance():
 
 def near_duplicate_leakage():
     print("\n" + "=" * 60)
-    print("2. NEAR-DUPLICATE LEAKAGE (CRTA examples)")
+    print("2. NEAR-DUPLICATE LEAKAGE (CRTA examples - only source with cluster_id)")
     print("=" * 60)
 
     cluster_sizes = crta.groupby("cluster_id").size()
     multi = (cluster_sizes > 1).sum()
-    print(
-        f"{multi}/{len(cluster_sizes)} headlines ({multi / len(cluster_sizes):.0%}) ran in >1 outlet the same day"
-    )
-    print(
-        f"mean outlets per headline: {cluster_sizes.mean():.2f}, max: {cluster_sizes.max()}"
-    )
+    print(f"{multi}/{len(cluster_sizes)} headlines ({multi / len(cluster_sizes):.0%}) ran in >1 outlet the same day")
+    print(f"mean outlets per headline: {cluster_sizes.mean():.2f}, max: {cluster_sizes.max()}")
     print("cluster size distribution:")
     print(cluster_sizes.value_counts().sort_index())
 
@@ -137,9 +143,7 @@ def near_duplicate_leakage():
     ax.bar(vc.index.astype(str), vc.values, color=LABEL_COLORS["vilifying_opponents"])
     ax.set_xlabel("outlets carrying the same headline")
     ax.set_ylabel("number of headlines")
-    ax.set_title(
-        "Cluster size: leakage if split by row, not by story", color=INK, fontsize=11
-    )
+    ax.set_title("Cluster size: leakage if split by row, not by story", color=INK, fontsize=11)
     ax.grid(axis="y", linewidth=0.6)
     ax.set_axisbelow(True)
     fig.tight_layout()
@@ -148,7 +152,7 @@ def near_duplicate_leakage():
 
 def outlet_label_crosstab():
     print("\n" + "=" * 60)
-    print("3. OUTLET x LABEL (outlet-as-confound check)")
+    print("3. OUTLET x LABEL (CRTA examples - only source with outlet variety so far)")
     print("=" * 60)
 
     # normalise CRTA's inconsistent outlet casing/punctuation (Alo vs Alo!, etc.)
@@ -158,9 +162,7 @@ def outlet_label_crosstab():
 
     crta["outlet_norm"] = crta["outlet"].map(norm_outlet)
     crosstab = pd.crosstab(crta["outlet_norm"], crta["label"])
-    crosstab = crosstab.reindex(
-        columns=[l for l in LABEL_ORDER if l in crosstab.columns]
-    )
+    crosstab = crosstab.reindex(columns=[l for l in LABEL_ORDER if l in crosstab.columns])
     crosstab = crosstab.loc[crosstab.sum(axis=1).sort_values(ascending=False).index]
     print(crosstab)
 
@@ -175,13 +177,8 @@ def outlet_label_crosstab():
             v = crosstab.values[i, j]
             if v:
                 ax.text(
-                    j,
-                    i,
-                    str(v),
-                    ha="center",
-                    va="center",
-                    color="white" if v > crosstab.values.max() / 2 else INK,
-                    fontsize=8,
+                    j, i, str(v), ha="center", va="center",
+                    color="white" if v > crosstab.values.max() / 2 else INK, fontsize=8,
                 )
     ax.set_title("Outlet x label counts (CRTA examples)", color=INK, fontsize=11)
     fig.colorbar(im, ax=ax, shrink=0.8, label="count")
@@ -191,24 +188,17 @@ def outlet_label_crosstab():
 
 def headline_length_by_label():
     print("\n" + "=" * 60)
-    print("4. HEADLINE LENGTH BY LABEL")
+    print("4. HEADLINE LENGTH BY LABEL (crta + llm_labels + labels.csv combined)")
     print("=" * 60)
 
-    crta_by_cluster = crta.drop_duplicates("cluster_id")
-    crta_by_cluster["n_words"] = crta_by_cluster["headline"].str.split().str.len()
-    print(
-        crta_by_cluster.groupby("label")["n_words"].describe()[
-            ["count", "mean", "min", "max"]
-        ]
-    )
+    combined = all_headlines()
+    combined["n_words"] = combined["headline"].str.split().str.len()
+    print(combined.groupby("label")["n_words"].describe()[["count", "mean", "min", "max"]])
+
+    present_labels = [l for l in LABEL_ORDER if l in combined["label"].unique()]
+    data_by_label = [combined.loc[combined["label"] == l, "n_words"].values for l in present_labels]
 
     fig, ax = plt.subplots(figsize=(7, 4))
-    data_by_label = [
-        crta_by_cluster.loc[crta_by_cluster["label"] == l, "n_words"].values
-        for l in LABEL_ORDER
-        if l in crta_by_cluster["label"].unique()
-    ]
-    present_labels = [l for l in LABEL_ORDER if l in crta_by_cluster["label"].unique()]
     bp = ax.boxplot(data_by_label, tick_labels=present_labels, patch_artist=True)
     for patch, l in zip(bp["boxes"], present_labels):
         patch.set_facecolor(LABEL_COLORS[l])
@@ -217,7 +207,7 @@ def headline_length_by_label():
         median.set_color(INK)
     ax.set_ylabel("words per headline")
     ax.tick_params(axis="x", rotation=20)
-    ax.set_title("Headline length by category (CRTA examples)", color=INK, fontsize=11)
+    ax.set_title("Headline length by category (crta + llm + labels)", color=INK, fontsize=11)
     ax.grid(axis="y", linewidth=0.6)
     ax.set_axisbelow(True)
     fig.tight_layout()
@@ -231,24 +221,21 @@ def script_check():
 
     CYRILLIC_RE = re.compile(r"[Ѐ-ӿ]")
     DIACRITIC_RE = re.compile(r"[šđčćžŠĐČĆŽ]")
-    crta_by_cluster = crta.drop_duplicates("cluster_id")
-    all_headlines = pd.concat([crta_by_cluster["headline"], labels["headline"]])
-    n_cyrillic = all_headlines.apply(lambda h: bool(CYRILLIC_RE.search(h))).sum()
-    n_diacritic = all_headlines.apply(lambda h: bool(DIACRITIC_RE.search(h))).sum()
-    print(f"{n_cyrillic}/{len(all_headlines)} headlines contain any Cyrillic character")
-    print(
-        f"{n_diacritic}/{len(all_headlines)} headlines contain a Latin diacritic (š đ č ć ž)"
-    )
-    print("-> everything we have so far is Latin script. Don't assume that holds once")
-    print("   RSS feeds from Cyrillic-first outlets (e.g. Politika, RTS) are added.")
+    headlines = all_headlines()["headline"]
+    n_cyrillic = headlines.apply(lambda h: bool(CYRILLIC_RE.search(h))).sum()
+    n_diacritic = headlines.apply(lambda h: bool(DIACRITIC_RE.search(h))).sum()
+    print(f"{n_cyrillic}/{len(headlines)} headlines contain any Cyrillic character")
+    print(f"{n_diacritic}/{len(headlines)} headlines contain a Latin diacritic (š đ č ć ž)")
+    print("-> everything we have so far is Latin script (all Kurir). Don't assume that")
+    print("   holds once RSS feeds from Cyrillic-first outlets (e.g. Politika, RTS) are added.")
 
 
 def top_words_per_category():
     print("\n" + "=" * 60)
-    print("6. TOP WORDS PER CATEGORY (crude - no stemming, small stopword list)")
+    print("6. TOP WORDS PER CATEGORY (crta + llm + labels, no stemming, small stopword list)")
     print("=" * 60)
 
-    crta_by_cluster = crta.drop_duplicates("cluster_id")
+    combined = all_headlines()
     STOPWORDS = set(
         """
         i u na za se je da su sa od do ne ali kao sto što će ce koji koja koje
@@ -264,16 +251,8 @@ def top_words_per_category():
         return [w for w in words if w not in STOPWORDS and len(w) > 2]
 
     fig, axes = plt.subplots(1, 4, figsize=(16, 4))
-    for ax, label in zip(
-        axes,
-        [
-            "vilifying_opponents",
-            "vilifying_neighbours",
-            "personality_cult",
-            "vilifying_eu",
-        ],
-    ):
-        subset = crta_by_cluster.loc[crta_by_cluster["label"] == label, "headline"]
+    for ax, label in zip(axes, ["vilifying_opponents", "vilifying_neighbours", "personality_cult", "vilifying_eu"]):
+        subset = combined.loc[combined["label"] == label, "headline"]
         counter = Counter(w for h in subset for w in tokens(h))
         top = counter.most_common(10)
         print(f"\n{label} (n={len(subset)}):")
@@ -284,11 +263,7 @@ def top_words_per_category():
             ax.barh(words, counts, color=LABEL_COLORS[label])
         ax.set_title(label, fontsize=9, color=INK)
         ax.tick_params(labelsize=8)
-    fig.suptitle(
-        "Top words per category (CRTA examples, stopwords removed)",
-        color=INK,
-        fontsize=11,
-    )
+    fig.suptitle("Top words per category (crta + llm + labels, stopwords removed)", color=INK, fontsize=11)
     fig.tight_layout()
     plt.show()
 
