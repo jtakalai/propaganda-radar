@@ -8,11 +8,12 @@ full underlying dataset (they haven't shared that - see CLAUDE.md "Open"),
 just the hand-picked examples in the public reports. Still real CRTA labels,
 so it's the best positive-example seed we have while we wait to hear back.
 
-    python scrape_crta.py
+    python scripts/scrape_crta.py
 
-Writes crta_examples.csv, overwriting it each run (the source reports don't
-change once published, so there's no "already done" state to preserve like
-label.py has).
+Writes data/crta_examples.csv, overwriting it each run (the source reports
+don't change once published, so there's no "already done" state to preserve
+like label.py has). Can be run from anywhere - output path is anchored to
+this file's location, not the cwd.
 """
 
 import csv
@@ -20,6 +21,7 @@ import re
 import time
 import urllib.request
 from collections import Counter
+from pathlib import Path
 
 # Serbian-language monthly reports. Slugs aren't consistent (most reuse the
 # English "<month>-manipulations" slug, February and July have Serbian-only
@@ -35,7 +37,7 @@ REPORT_URLS = [
     "https://crta.plus/sr/updates/manipulacije-u-julu/",
 ]
 
-OUT = "crta_examples.csv"
+OUT = Path(__file__).resolve().parent.parent / "data" / "crta_examples.csv"
 
 USER_AGENT = "Mozilla/5.0 (propaganda-radar university project; contact via github)"
 

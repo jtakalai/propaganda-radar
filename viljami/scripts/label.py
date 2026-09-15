@@ -2,11 +2,12 @@
 Scrape headlines from one site's RSS feed and label them by hand.
 
     pip install feedparser deep-translator
-    python label.py              # headlines only
-    python label.py --translate  # also show an English gloss (Google Translate)
+    python scripts/label.py              # headlines only
+    python scripts/label.py --translate  # also show an English gloss (Google Translate)
 
-Labels are appended to labels.csv as you go, so quitting never loses work.
-Headlines you've already labelled are skipped on the next run.
+Labels are appended to data/labels.csv as you go, so quitting never loses work.
+Headlines you've already labelled are skipped on the next run. Can be run from
+anywhere - output path is anchored to this file's location, not the cwd.
 """
 
 import argparse
@@ -14,11 +15,12 @@ import csv
 import datetime
 import os
 import random
+from pathlib import Path
 
 
 FEED = "https://www.kurir.rs/rss/politika"  # politics section only; check in a browser first
 OUTLET = "Kurir"
-OUT = "labels.csv"
+OUT = Path(__file__).resolve().parent.parent / "data" / "labels.csv"
 
 BUCKETS = {
     "1": "vilifying_opponents",
