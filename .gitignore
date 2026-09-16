@@ -1,3 +1,4 @@
 .direnv/
 __pycache__/
 viljami/data/llm_batch_pending.csv
+viljami/propaganda-radar/data/
