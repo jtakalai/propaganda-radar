@@ -10,7 +10,7 @@ import streamlit as st
 from classifier import LABELS
 from store import DEFAULT_DATA_PATH, CsvStore
 
-LIST_COLUMNS = ["outlet", "date", "headline", "predicted_label", "predicted_confidence"]
+LIST_COLUMNS = ["outlet", "date", "headline", "predicted_label", "label", "match"]
 
 st.set_page_config(page_title="Propaganda Radar", layout="wide")
 st.title("Propaganda Radar")
@@ -21,6 +21,13 @@ df = store.load()
 if df.empty:
     st.info("No headlines yet - run feeder.py first.")
     st.stop()
+
+# blank until labelled, then an instant right/wrong check against the model -
+# also the filter for "give me the training set": df[df["label"] != ""]
+df["match"] = df.apply(
+    lambda r: "" if r["label"] == "" else ("✓" if r["label"] == r["predicted_label"] else "✗"),
+    axis=1,
+)
 
 selection = st.dataframe(
     df[LIST_COLUMNS],
