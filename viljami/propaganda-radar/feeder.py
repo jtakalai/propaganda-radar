@@ -1,11 +1,14 @@
 """Pull headlines from RSS feeds, classify them, and store the new ones.
 
-    python feeder.py
+    python feeder.py                  # single pull
+    python feeder.py --interval 900   # keep polling every 900s (ctrl-c to stop)
 
 Safe to run repeatedly or on a timer - already-seen URLs are skipped.
 Output path is anchored to this file's location, so it works from any cwd.
 """
 
+import argparse
+import time
 from datetime import date as _date
 from pathlib import Path
 
@@ -54,10 +57,32 @@ def fetch_new_rows() -> list[dict]:
     return rows
 
 
-def main():
-    store = CsvStore(DATA_PATH)
+def poll_once(store: CsvStore) -> None:
     added = store.upsert(fetch_new_rows())
-    print(f"added {added} new headlines to {DATA_PATH}")
+    print(f"[{_date.today().isoformat()}] added {added} new headlines to {DATA_PATH}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--interval",
+        type=int,
+        default=None,
+        help="keep polling every N seconds instead of pulling once",
+    )
+    args = parser.parse_args()
+
+    store = CsvStore(DATA_PATH)
+    if args.interval is None:
+        poll_once(store)
+        return
+
+    try:
+        while True:
+            poll_once(store)
+            time.sleep(args.interval)
+    except KeyboardInterrupt:
+        print("\nstopping")
 
 
 if __name__ == "__main__":
