@@ -68,8 +68,12 @@ with right:
     st.markdown("**Correct label**")
     current = row["label"] or row["predicted_label"]
     corrected = st.selectbox("label", LABELS, index=LABELS.index(current), key=f"label-{row['url']}", label_visibility="collapsed")
+
+    st.markdown("**Comment** - why is this right/wrong?")
+    comment = st.text_area("comment", value=row["comment"], key=f"comment-{row['url']}", label_visibility="collapsed")
+
     if st.button("Save"):
-        store.set_label(row["url"], corrected, labelled_by="ui")
+        store.set_label(row["url"], corrected, labelled_by="ui", comment=comment)
         st.success("saved")
         st.rerun()
 

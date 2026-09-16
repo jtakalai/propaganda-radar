@@ -28,6 +28,7 @@ COLUMNS = [
     "predicted_probs",
     "model_version",
     "label",
+    "comment",
     "labelled_by",
     "labelled_at",
     "cluster_id",
@@ -41,7 +42,8 @@ class CsvStore:
     def load(self) -> pd.DataFrame:
         if not self.path.exists():
             return pd.DataFrame(columns=COLUMNS)
-        return pd.read_csv(self.path, dtype=str).fillna("")
+        df = pd.read_csv(self.path, dtype=str).fillna("")
+        return df.reindex(columns=COLUMNS, fill_value="")
 
     def save(self, df: pd.DataFrame) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -57,9 +59,9 @@ class CsvStore:
             self.save(df)
         return len(new_rows)
 
-    def set_label(self, url: str, label: str, labelled_by: str) -> None:
+    def set_label(self, url: str, label: str, labelled_by: str, comment: str = "") -> None:
         df = self.load()
         df.loc[
-            df["url"] == url, ["label", "labelled_by", "labelled_at"]
-        ] = [label, labelled_by, datetime.now().isoformat(timespec="seconds")]
+            df["url"] == url, ["label", "comment", "labelled_by", "labelled_at"]
+        ] = [label, comment, labelled_by, datetime.now().isoformat(timespec="seconds")]
         self.save(df)
