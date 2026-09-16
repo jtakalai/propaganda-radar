@@ -8,13 +8,16 @@ Output path is anchored to this file's location, so it works from any cwd.
 """
 
 import argparse
+import json
+import re
 import time
 from datetime import date as _date
+from html import unescape
 from pathlib import Path
 
 import feedparser
 
-from classifier import predict
+from classifier import VERSION, predict
 from store import CsvStore
 
 DATA_PATH = Path(__file__).resolve().parent / "data" / "feed.csv"
@@ -35,20 +38,35 @@ def entry_url(entry, feed_url: str) -> str:
     return entry.get("link") or entry.get("id") or feed_url
 
 
+def entry_summary(entry) -> str:
+    """Best-effort text snippet from the feed - strip HTML, collapse whitespace.
+
+    RSS summaries are often just a thumbnail <img> with no real text (true
+    for Kurir's feed), so this can legitimately come back empty. There's no
+    full article body here - that would mean scraping each article page,
+    which isn't built yet.
+    """
+    text = re.sub(r"<[^>]+>", " ", entry.get("summary", ""))
+    return re.sub(r"\s+", " ", unescape(text)).strip()
+
+
 def fetch_new_rows() -> list[dict]:
     rows = []
     for outlet, feed_url in FEEDS:
         feed = feedparser.parse(feed_url)
         for entry in feed.entries:
-            label, confidence = predict(entry.title)
+            label, confidence, probabilities = predict(entry.title)
             rows.append(
                 {
                     "outlet": outlet,
                     "date": entry_date(entry),
                     "headline": entry.title,
                     "url": entry_url(entry, feed_url),
+                    "summary": entry_summary(entry),
                     "predicted_label": label,
                     "predicted_confidence": confidence,
+                    "predicted_probs": json.dumps(probabilities),
+                    "model_version": VERSION,
                     "label": "",
                     "labelled_by": "",
                     "labelled_at": "",
