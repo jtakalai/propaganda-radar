@@ -13,14 +13,11 @@ import re
 import time
 from datetime import date as _date
 from html import unescape
-from pathlib import Path
 
 import feedparser
 
 from classifier import VERSION, predict
-from store import CsvStore
-
-DATA_PATH = Path(__file__).resolve().parent / "data" / "feed.csv"
+from store import DEFAULT_DATA_PATH, CsvStore
 
 FEEDS = [
     ("Kurir", "https://www.kurir.rs/rss/politika"),
@@ -70,6 +67,7 @@ def fetch_new_rows() -> list[dict]:
                     "label": "",
                     "labelled_by": "",
                     "labelled_at": "",
+                    "cluster_id": "",
                 }
             )
     return rows
@@ -77,7 +75,7 @@ def fetch_new_rows() -> list[dict]:
 
 def poll_once(store: CsvStore) -> None:
     added = store.upsert(fetch_new_rows())
-    print(f"[{_date.today().isoformat()}] added {added} new headlines to {DATA_PATH}")
+    print(f"[{_date.today().isoformat()}] added {added} new headlines to {store.path}")
 
 
 def main():
@@ -90,7 +88,7 @@ def main():
     )
     args = parser.parse_args()
 
-    store = CsvStore(DATA_PATH)
+    store = CsvStore(DEFAULT_DATA_PATH)
     if args.interval is None:
         poll_once(store)
         return

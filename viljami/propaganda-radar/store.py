@@ -3,12 +3,19 @@
 Swap for another backend later (e.g. SQLite) by writing a class with the
 same three methods - load / upsert / set_label - and pointing feeder.py
 and dashboard.py at it instead of CsvStore.
+
+DEFAULT_DATA_PATH is the one canonical data file for this whole module -
+everything (feeder.py, dashboard.py, import_existing.py) reads and writes
+here. Don't add another data file; if a new source needs to feed in, write
+it into this one via CsvStore.upsert instead.
 """
 
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
+
+DEFAULT_DATA_PATH = Path(__file__).resolve().parent / "data" / "data.csv"
 
 COLUMNS = [
     "outlet",
@@ -23,6 +30,7 @@ COLUMNS = [
     "label",
     "labelled_by",
     "labelled_at",
+    "cluster_id",
 ]
 
 

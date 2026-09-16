@@ -4,20 +4,18 @@
 """
 
 import json
-from pathlib import Path
 
 import streamlit as st
 
 from classifier import LABELS
-from store import CsvStore
+from store import DEFAULT_DATA_PATH, CsvStore
 
-DATA_PATH = Path(__file__).resolve().parent / "data" / "feed.csv"
 LIST_COLUMNS = ["outlet", "date", "headline", "predicted_label", "predicted_confidence"]
 
 st.set_page_config(page_title="Propaganda Radar", layout="wide")
 st.title("Propaganda Radar")
 
-store = CsvStore(DATA_PATH)
+store = CsvStore(DEFAULT_DATA_PATH)
 df = store.load()
 
 if df.empty:
