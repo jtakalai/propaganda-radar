@@ -22,6 +22,13 @@ if df.empty:
     st.info("No headlines yet - run feeder.py first.")
     st.stop()
 
+labelled = df[df["label"] != ""]
+with st.sidebar:
+    st.metric("Total headlines", len(df))
+    st.metric("Labelled", f"{len(labelled)} ({len(labelled) / len(df):.0%})")
+    st.caption("By label:")
+    st.dataframe(labelled["label"].value_counts(), use_container_width=True)
+
 # blank until labelled, then an instant right/wrong check against the model -
 # also the filter for "give me the training set": df[df["label"] != ""]
 df["match"] = df.apply(
