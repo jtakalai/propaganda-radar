@@ -1,4 +1,5 @@
-"""
+"""ARCHIVED - not part of the live pipeline. See README.md in this directory.
+
 Pull CRTA's own published example headlines from their monthly "front page
 manipulations" reports and turn them into a labelled CSV.
 
@@ -8,9 +9,9 @@ full underlying dataset (they haven't shared that - see CLAUDE.md "Open"),
 just the hand-picked examples in the public reports. Still real CRTA labels,
 so it's the best positive-example seed we have while we wait to hear back.
 
-    python scripts/scrape_crta.py
+    python archive/crta/scrape.py
 
-Writes data/raw/crta_examples.csv, overwriting it each run (the source reports
+Writes crta_examples.csv next to this file, overwriting it each run (the source reports
 don't change once published, so there's no "already done" state to preserve
 like the labelling CLI has). Can be run from anywhere.
 """
@@ -20,8 +21,7 @@ import re
 import time
 import urllib.request
 from collections import Counter
-
-from radar.config import CRTA_EXAMPLES
+from pathlib import Path
 
 # Serbian-language monthly reports. Slugs aren't consistent (most reuse the
 # English "<month>-manipulations" slug, February and July have Serbian-only
@@ -37,7 +37,7 @@ REPORT_URLS = [
     "https://crta.plus/sr/updates/manipulacije-u-julu/",
 ]
 
-OUT = CRTA_EXAMPLES
+OUT = Path(__file__).resolve().parent / "crta_examples.csv"
 
 USER_AGENT = "Mozilla/5.0 (propaganda-radar university project; contact via github)"
 

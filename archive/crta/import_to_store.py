@@ -1,12 +1,14 @@
-"""Load the raw collected files into the canonical store.
+"""ARCHIVED - not part of the live pipeline. See README.md in this directory.
 
-    python scripts/ingest.py
+Load the archived CRTA examples into the canonical store.
 
-This is the raw -> processed edge of the pipeline. data/raw/ is immutable:
-it holds each source exactly as collected, and this is the only thing that
-reads it. Re-running is safe - upsert skips rows already in the store, so
-this is how you rebuild data/processed/headlines.csv from scratch after
-deleting it.
+    python archive/crta/import_to_store.py
+
+This ran once. Its 162 rows are already in data/processed/headlines.csv with
+labelled_by="crta", and the store is committed, so there is nothing to
+re-run. It is kept because it is the only mechanical record of how those
+rows got their columns. Re-running is safe: upsert skips rows already there,
+so it is also how you would rebuild them if the store were ever lost.
 
 CRTA's examples arrive already labelled, so they go in with labelled_by
 "crta" and keep their cluster_id - the marker for the same story running
@@ -19,11 +21,14 @@ reviewer can be sent to; the fragment keeps one cluster's rows distinguishable
 from another's in the same report.
 """
 
+from pathlib import Path
+
 import pandas as pd
 
-from radar.config import CRTA_EXAMPLES
 from radar.model.classifier import prediction_columns
 from radar.store import CsvStore
+
+CRTA_EXAMPLES = Path(__file__).resolve().parent / "crta_examples.csv"
 
 
 def crta_rows() -> list[dict]:

@@ -3,7 +3,7 @@
 Subpackages follow the six data-lifecycle stages the course grades
 (docs/data-lifecycle.md):
 
-    collect/   stage 2 - RSS, sitemap archive, CRTA's published reports
+    collect/   stage 2 - RSS feeds and Kurir's sitemap archive
     prepare/   stage 3 - script normalisation, outlet canonicalisation
     label/     stage 3 - human CLI and LLM-assisted labelling
     model/     stage 5 - the rungs of the model ladder

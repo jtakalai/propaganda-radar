@@ -77,7 +77,9 @@ six lifecycle stages — see README.md for the tree and
 - `data/processed/headlines.csv` — the one canonical dataset, via `radar/store.py`.
   Row identity is `(url, headline, outlet)`; `labelled_by` carries provenance
   and separates verified labels from the LLM's guesses
-- `data/raw/` — immutable. `radar/prepare/ingest.py` is the only reader
+- `data/raw/` — immutable
+- `archive/crta/` — frozen. CRTA's 162 example rows are already in the store
+  (`labelled_by="crta"`); we aren't pulling from them again
 - `scripts/` — thin entrypoints, no logic
 - `app/dashboard.py`, `analysis/eda.py`, `tests/`
 

@@ -18,8 +18,7 @@ PROCESSED = DATA / "processed"
 # and its label if someone (or something) has given it one. See docs/data-dictionary.md.
 HEADLINES = PROCESSED / "headlines.csv"
 
-# Raw inputs, immutable once collected - regenerate with radar.collect.*, never edit.
-CRTA_EXAMPLES = RAW / "crta_examples.csv"
+# Raw inputs, immutable once collected - never edit in place.
 BACKGROUND_HEADLINES = RAW / "background_headlines.csv"
 
 # Staging, safe to clobber.

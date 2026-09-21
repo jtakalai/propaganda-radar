@@ -36,14 +36,15 @@ data/raw/          as collected, never edited by hand
 data/interim/      staging, safe to clobber
 data/processed/    headlines.csv — the one canonical dataset
 radar/             all the logic, laid out by data-lifecycle stage
-  collect/           2. RSS feeds, Kurir's sitemap archive, CRTA's reports
-  prepare/           3. script normalisation, outlet names, raw -> store
+  collect/           2. RSS feeds, Kurir's sitemap archive
+  prepare/           3. script normalisation, outlet names
   label/             3. hand-labelling CLI, LLM-assisted labelling
   model/             5. the rungs of the model ladder
   evaluate/          5. precision and recall
 analysis/eda.py    4. explore — writes to reports/figures/
 app/dashboard.py   6. communicate — the review UI
 scripts/           entrypoints; `make` calls these
+archive/crta/      frozen — CRTA's examples and the scraper that got them
 docs/              data dictionary, course requirements
 ```
 

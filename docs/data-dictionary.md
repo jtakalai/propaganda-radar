@@ -5,19 +5,17 @@ Every file in `data/`, what its columns mean, and how it got there.
 ## The pipeline
 
 ```
-crta.plus reports ─ radar/collect/crta.py ──→ data/raw/crta_examples.csv ─┐
-                                                                          ├─ radar/prepare/ingest.py ─→ data/processed/headlines.csv
-Kurir RSS ──────── radar/collect/rss.py ─────────────────────────────────┘                                        │
-                                                                                                                   │
-Kurir sitemap ──── radar/collect/sitemap.py ─→ data/interim/llm_batch_pending.csv                                  │
-                                                                                                                   ↓
-                                                             radar/label/{cli,llm}.py, app/dashboard.py ──→ label columns
+Kurir RSS ──────── radar/collect/rss.py ─────→ data/processed/headlines.csv
+                                                             │
+Kurir sitemap ──── radar/collect/sitemap.py ─→ data/interim/llm_batch_pending.csv
+                                                             │
+                                                             ↓
+                    radar/label/{cli,llm}.py, app/dashboard.py ──→ label columns
+
+archive/crta/ ──── ran once in Sept 2026, 162 rows, not repeated
 ```
 
-Raw is immutable. Nothing edits `data/raw/` after collection, and
-`ingest.py` is the only thing that reads it. Deleting
-`data/processed/headlines.csv` and running `make ingest && make collect`
-rebuilds it.
+Raw is immutable: nothing edits `data/raw/` after collection.
 
 ## `data/processed/headlines.csv` — the canonical store
 
@@ -59,11 +57,14 @@ person, and they are the minority.
 | `claude-code`     | an LLM, via `make label-llm`            | **no**    |
 | *(empty)*         | not yet labelled                        | —         |
 
-## `data/raw/crta_examples.csv`
+## `archive/crta/crta_examples.csv` — frozen
 
-CRTA's published example headlines, scraped from their monthly reports by
-`radar/collect/crta.py`. Columns: `outlet`, `date`, `headline`, `label`,
-`cluster_id`, `source_url`.
+CRTA's published example headlines. **Archived — we are not pulling from
+CRTA again**, and nothing in the live pipeline reads this file. Its 162 rows
+are already in the store with `labelled_by="crta"`. See
+`archive/crta/README.md`.
+
+Columns: `outlet`, `date`, `headline`, `label`, `cluster_id`, `source_url`.
 
 These are the examples CRTA quotes to illustrate each category — **not**
 their full underlying dataset, which they haven't shared. 162 outlet-rows
@@ -97,3 +98,6 @@ Staging only, rewritten by every `make batch`, gitignored. Columns:
 files from before the store existed. Every row in them is in
 `data/processed/headlines.csv`; they were removed once that was verified.
 Git history has them if anyone needs to check.
+
+`data/raw/crta_examples.csv` moved to `archive/crta/` when CRTA collection
+stopped.
