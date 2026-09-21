@@ -8,7 +8,6 @@ Output path is anchored to this file's location, so it works from any cwd.
 """
 
 import argparse
-import json
 import re
 import time
 from datetime import date as _date
@@ -16,7 +15,7 @@ from html import unescape
 
 import feedparser
 
-from classifier import VERSION, predict
+from classifier import prediction_columns
 from store import DEFAULT_DATA_PATH, CsvStore
 
 FEEDS = [
@@ -52,7 +51,6 @@ def fetch_new_rows() -> list[dict]:
     for outlet, feed_url in FEEDS:
         feed = feedparser.parse(feed_url)
         for entry in feed.entries:
-            label, confidence, probabilities = predict(entry.title)
             rows.append(
                 {
                     "outlet": outlet,
@@ -60,10 +58,7 @@ def fetch_new_rows() -> list[dict]:
                     "headline": entry.title,
                     "url": entry_url(entry, feed_url),
                     "summary": entry_summary(entry),
-                    "predicted_label": label,
-                    "predicted_confidence": confidence,
-                    "predicted_probs": json.dumps(probabilities),
-                    "model_version": VERSION,
+                    **prediction_columns(entry.title),
                     "label": "",
                     "labelled_by": "",
                     "labelled_at": "",

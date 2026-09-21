@@ -8,6 +8,7 @@ import json
 import streamlit as st
 
 from classifier import LABELS
+from rules import fired_rules
 from store import DEFAULT_DATA_PATH, CsvStore
 
 LIST_COLUMNS = ["outlet", "date", "headline", "predicted_label", "label", "match"]
@@ -64,6 +65,8 @@ with left:
 
 with right:
     st.metric("Predicted label", row["predicted_label"])
+    for rule in fired_rules(row["headline"]):
+        st.caption(f"Matched rule: **{rule.name}** → {rule.label}")
 
     st.markdown("**Correct label**")
     current = row["label"] or row["predicted_label"]

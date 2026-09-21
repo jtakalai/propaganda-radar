@@ -1,17 +1,22 @@
 """Classifier interface: predict(headline) -> (label, confidence, probabilities).
 
-This is rung 0 of CLAUDE.md's model ladder - always predict "nothing", the
-baseline nobody should lose to. Later rungs (keyword rules, TF-IDF,
-embeddings, SetFit) replace the body of `predict` with the same signature,
-so feeder.py and dashboard.py never need to change.
+This is rung 1 of CLAUDE.md's model ladder - keyword and entity rules (see
+rules.py). Later rungs (TF-IDF, embeddings, SetFit) replace the body of
+`predict` with the same signature, so feeder.py and dashboard.py never need
+to change.
 
 `probabilities` is a score per label (they don't need to sum to 1 - whatever
-the model naturally produces). The dashboard shows these in a collapsed
-debug panel, not the main view - keep the interface honest even when the
-model behind it is a dummy.
+the model naturally produces). Here it is the number of rules that fired for
+each label; "nothing" scores 1 only when no rule fired. The dashboard shows
+these in a collapsed debug panel, not the main view.
 """
 
-VERSION = "rung0-dummy"
+import json
+from collections import Counter
+
+from rules import fired_rules
+
+VERSION = "rung1-rules"
 
 LABELS = [
     "vilifying_opponents",
@@ -23,6 +28,20 @@ LABELS = [
 
 
 def predict(headline: str) -> tuple[str, float, dict[str, float]]:
-    probabilities = {label: 0.0 for label in LABELS}
-    probabilities["nothing"] = 1.0
-    return "nothing", 1.0, probabilities
+    hits = Counter(rule.label for rule in fired_rules(headline))
+    if not hits:
+        return "nothing", 1.0, {label: float(label == "nothing") for label in LABELS}
+    probabilities = {label: float(hits[label]) for label in LABELS}
+    label = max(LABELS, key=hits.__getitem__)
+    return label, hits[label] / sum(hits.values()), probabilities
+
+
+def prediction_columns(headline: str) -> dict:
+    """The predicted_* / model_version columns of a store row."""
+    label, confidence, probabilities = predict(headline)
+    return {
+        "predicted_label": label,
+        "predicted_confidence": confidence,
+        "predicted_probs": json.dumps(probabilities),
+        "model_version": VERSION,
+    }
