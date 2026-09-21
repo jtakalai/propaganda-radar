@@ -1,26 +1,54 @@
-[project]
-name = "propaganda-radar"
-version = "0.1.0"
-description = "Flags Serbian news headlines against CRTA's manipulation-narrative criteria."
-requires-python = ">=3.11"
-dependencies = [
-    "pandas",
-    "scikit-learn",
-    "matplotlib",
-    "feedparser",
-    "streamlit",
-]
+[tool.black]
+line-length = 80
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | venv
+  | build
+  | dist
+  | alembic
+)/
+'''
 
-[project.optional-dependencies]
-# Only needed by radar/label/cli.py --translate and by the test suite.
-dev = ["deep-translator", "pytest"]
-
-[build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
-
-[tool.setuptools]
-packages = ["radar", "radar.collect", "radar.prepare", "radar.label", "radar.model", "radar.evaluate"]
+[tool.isort]
+profile = "black"
+line_length = 80
+skip_gitignore = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "asyncio: mark test as an asyncio test",
+]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
