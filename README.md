@@ -13,24 +13,21 @@ accepts or rejects it in the dashboard.
 
 ## Categories
 
-| Label                  | CRTA's criterion                                            |
-| ---------------------- | ----------------------------------------------------------- |
-| `vilifying_opponents`  | discrediting opposition, protesters, the student blockades   |
-| `vilifying_neighbours` | Croatia, Montenegro, Kosovo framed as hostile to Serbs       |
-| `personality_cult`     | Vučić as indispensable / heroic                              |
-| `vilifying_eu`         | the EU and the West as hostile or hypocritical               |
-| `nothing`              | none of the above — roughly 98% of headlines                 |
+| Label                  | CRTA's criterion                                           |
+| ---------------------- | ---------------------------------------------------------- |
+| `vilifying_opponents`  | discrediting opposition, protesters, the student blockades |
+| `vilifying_neighbours` | Croatia, Montenegro, Kosovo framed as hostile to Serbs     |
+| `personality_cult`     | Vučić as indispensable / heroic                            |
+| `vilifying_eu`         | the EU and the West as hostile or hypocritical             |
+| `nothing`              | none of the above — roughly 98% of headlines               |
 
 ## Run it
 
 ```sh
-nix-shell          # or: pip install -r requirements.txt && pip install -e .
-make               # lists every task
-make app           # the review dashboard
+make              # lists every task
+make setup        # install dependencies
+make app          # the review dashboard
 ```
-
-Everything runs from the repo root. The Makefile prepends the repo to
-`PYTHONPATH`; `pip install -e .` does the same job permanently.
 
 ## Where things are
 
@@ -50,34 +47,13 @@ scripts/           entrypoints; `make` calls these
 docs/              data dictionary, course requirements
 ```
 
-`docs/data-dictionary.md` explains every column and where each file comes from.
-
 ## Where it stands
 
-Rung 1 of the model ladder (keyword and entity rules). Against 265 labelled
-headlines it flags at **0.99 precision / 0.48 recall**.
-
-Treat that recall as the real number and that precision as optimistic: the
-rules were written while looking at these same headlines, and a rule-based
-rung has no held-out split. Rung 2 onwards will have one.
-
-Two things have to land before any model number means much:
-
-- **Inter-annotator agreement is unmeasured.** Until we know how often two
-  people agree on these categories, we don't know what score is even possible.
-- **Outlet is a confound.** 145 of 265 labelled headlines are Kurir. A model
-  can score well by learning "this is Kurir", so performance is always
-  reported with the outlet held out.
+TODO
 
 ## The ladder
 
-Simplest first. Each rung has to beat the one below it or we stop.
-
-0. always predict `nothing` — the baseline nobody should lose to
-1. **keyword + entity rules** ← we are here
-2. TF-IDF + linear model
-3. sentence embeddings + logistic regression
-4. SetFit on BERTić, only if 3 justifies it
+TODO
 
 ## Who
 
