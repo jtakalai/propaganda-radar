@@ -18,5 +18,6 @@ pkgs.mkShell {
     python3Packages.feedparser
     python3Packages.deep-translator
     python3Packages.streamlit
+    python3Packages.pytest
   ];
 }

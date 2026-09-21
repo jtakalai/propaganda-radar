@@ -1,0 +1,26 @@
+[project]
+name = "propaganda-radar"
+version = "0.1.0"
+description = "Flags Serbian news headlines against CRTA's manipulation-narrative criteria."
+requires-python = ">=3.11"
+dependencies = [
+    "pandas",
+    "scikit-learn",
+    "matplotlib",
+    "feedparser",
+    "streamlit",
+]
+
+[project.optional-dependencies]
+# Only needed by radar/label/cli.py --translate and by the test suite.
+dev = ["deep-translator", "pytest"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["radar", "radar.collect", "radar.prepare", "radar.label", "radar.model", "radar.evaluate"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

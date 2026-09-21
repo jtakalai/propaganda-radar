@@ -1,0 +1,10 @@
+# For anyone not using shell.nix (`pip install -r requirements.txt && pip install -e .`).
+# Unpinned on purpose: this is a teaching project with no deployment target, and
+# pinning would rot faster than it would help. shell.nix is the reproducible path.
+pandas
+scikit-learn
+matplotlib
+feedparser
+streamlit
+deep-translator
+pytest

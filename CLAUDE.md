@@ -69,14 +69,26 @@ spotlight presentation, or scoping. They are not needed for modelling work.
 
 ## Repo
 
-- `label.py` — RSS scrape + manual labelling CLI, writes `labels.csv`
-- `labels.csv` — our hand labels (outlet, date, headline, label, url)
+Run everything from the repo root; `make` lists the tasks. Layout mirrors the
+six lifecycle stages — see README.md for the tree and
+`docs/data-dictionary.md` for every column and where each file came from.
+
+- `radar/` — the package. `collect/` `prepare/` `label/` `model/` `evaluate/`
+- `data/processed/headlines.csv` — the one canonical dataset, via `radar/store.py`.
+  Row identity is `(url, headline, outlet)`; `labelled_by` carries provenance
+  and separates verified labels from the LLM's guesses
+- `data/raw/` — immutable. `radar/prepare/ingest.py` is the only reader
+- `scripts/` — thin entrypoints, no logic
+- `app/dashboard.py`, `analysis/eda.py`, `tests/`
+
+Labels and paths live in `radar/config.py`. Don't re-spell them anywhere else.
 
 ## Open
 
 - CRTA emailed about sharing their labelled data — no answer yet
 - Some of their own examples look multi-label (7/27 Kurir is both personality cult
   and vilifying opponents). If that's common, 5-way multi-class is the wrong shape.
+  The store has one `label` column, so multi-label would be a schema change.
 - Inter-annotator agreement not yet measured. Every model number is uninterpretable
   until it is.
 
