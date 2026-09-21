@@ -57,6 +57,16 @@ Flag, never verdict. "Matches CRTA's coding criteria" — not "is propaganda", n
 "is false". Human in the loop, always. Show which rule or feature fired so a person
 can accept or reject it.
 
+## Course requirements
+
+Read these only when the task touches grading, deliverables, the report, the
+spotlight presentation, or scoping. They are not needed for modelling work.
+
+- `docs/mini-project-guidelines.md` — deadlines, spotlight rules, deliverables
+  (web app + 5-page report), assessment criteria
+- `docs/data-lifecycle.md` — the six lifecycle stages the course grades, and
+  where we stand on each
+
 ## Repo
 
 - `label.py` — RSS scrape + manual labelling CLI, writes `labels.csv`
