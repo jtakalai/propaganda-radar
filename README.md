@@ -42,7 +42,8 @@ radar/             all the logic, laid out by data-lifecycle stage
   model/             5. the rungs of the model ladder
   evaluate/          5. precision and recall
 analysis/eda.py    4. explore — writes to reports/figures/
-app/dashboard.py   6. communicate — the review UI
+app/dashboard.py   6. communicate — our own review UI, never shown to CRTA
+web/index.html     6. communicate — the site for CRTA; one file, no build step
 scripts/           entrypoints; `make` calls these
 archive/crta/      frozen — CRTA's examples and the scraper that got them
 docs/              data dictionary, course requirements

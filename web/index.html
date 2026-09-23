@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="sr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Propaganda Radar</title>
+<script defer src="alpine.min.js"></script>
+<style>
+  :root {
+    --ink: #171614; --ink-soft: #5c5a54; --ink-faint: #8d8a82;
+    --surface: #fbfaf7; --card: #ffffff; --line: #e4e1d8;
+    --accent: #9a2a1f; --mark: #fbe6a2; --ok: #1c7a54; --chip: #f1eee6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #eceae4; --ink-soft: #b3afa6; --ink-faint: #85817a;
+      --surface: #16150f; --card: #1e1d16; --line: #33312a;
+      --accent: #e8887b; --mark: #6b5a1c; --ok: #6bbf95; --chip: #2a2921;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--surface); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 0 16px 80px; }
+  .bar {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 16px 0; border-bottom: 1px solid var(--line); margin-bottom: 30px;
+  }
+  button, select {
+    font: inherit; font-size: 14px; color: var(--ink); background: var(--card);
+    border: 1px solid var(--line); border-radius: 7px; padding: 7px 12px; cursor: pointer;
+  }
+  button:hover:not(:disabled), select:hover { border-color: var(--ink-faint); }
+  button:disabled { opacity: .5; cursor: default; }
+  button.primary { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+  .toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+  .toggle button { border: 0; border-radius: 0; }
+  .toggle button.on { background: var(--ink); color: var(--surface); }
+  .note { font-size: 14px; color: var(--ink-soft); margin-left: auto; }
+
+  /* ---- preview: shaped after CRTA's monthly reports ---- */
+  .post { max-width: 640px; margin: 0 auto; }
+  .post h1 { font-family: Georgia, "Times New Roman", serif; font-size: 32px; line-height: 1.2; margin: 0 0 12px; }
+  .post .byline { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
+  .post .lead { font-family: Georgia, serif; font-size: 19px; line-height: 1.6; margin: 18px 0 34px; }
+  .post h4 {
+    font-family: Georgia, serif; font-size: 19px; font-weight: 600;
+    margin: 30px 0 0; padding-top: 22px; border-top: 1px solid var(--line);
+  }
+  .post h5 { font-size: 14px; color: var(--ink-soft); margin: 16px 0 10px; font-weight: 600; }
+  .post ul { list-style: none; margin: 0; padding: 0; }
+  .post li {
+    font-family: Georgia, serif; font-size: 16px; line-height: 1.55;
+    border-left: 2px solid var(--line); padding-left: 14px; margin-bottom: 14px;
+  }
+  .post li .src { color: var(--ink-faint); font-size: 14px; }
+  .post li a { color: inherit; }
+  .post .more { font-size: 14px; color: var(--ink-faint); font-style: italic; }
+  .post .closing {
+    font-size: 14px; color: var(--ink-soft); border-top: 1px solid var(--line);
+    margin-top: 34px; padding-top: 16px;
+  }
+
+  /* ---- review: one card per headline, newest first ---- */
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 13px 16px; margin-bottom: 10px;
+  }
+  .card .meta { font-size: 13px; color: var(--ink-faint); }
+  .card .meta a { color: var(--ink-soft); }
+  .card .headline { font-family: Georgia, serif; font-size: 17px; line-height: 1.45; margin: 6px 0 11px; }
+  .card .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .chip {
+    font-size: 13px; background: var(--chip); border: 1px solid var(--line);
+    border-radius: 999px; padding: 4px 11px; color: var(--ink-soft);
+  }
+  .chip.flag { color: var(--accent); border-color: var(--accent); background: transparent; }
+  .verified { color: var(--ok); font-size: 13px; }
+  mark { background: var(--mark); color: inherit; padding: 0 2px; border-radius: 3px; }
+  .day { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); margin: 24px 0 10px; }
+  .empty { color: var(--ink-soft); padding: 46px 0; text-align: center; }
+  .banner {
+    background: var(--card); border: 1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius: 7px; padding: 10px 14px; font-size: 14px; color: var(--ink-soft); margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap" x-data="radar()" x-init="load()">
+
+  <div class="bar">
+    <span class="toggle">
+      <button :class="view === 'preview' ? 'on' : ''" @click="view = 'preview'">Preview</button>
+      <button :class="view === 'review' ? 'on' : ''" @click="view = 'review'">Review</button>
+    </span>
+    <select x-model.number="days">
+      <option value="7">Last 7 days</option>
+      <option value="30">Last 30 days</option>
+      <option value="365">Last year</option>
+      <option value="99999">Everything</option>
+    </select>
+    <button class="primary" @click="fetchLatest()" x-show="writable" :disabled="busy"
+            x-text="busy ? 'Fetching…' : 'Fetch latest'"></button>
+    <button x-show="view === 'preview'" @click="copyText()" x-text="copied ? 'Copied' : 'Copy text'"></button>
+    <button x-show="view === 'review'" @click="hideConfirmed = !hideConfirmed"
+            x-text="hideConfirmed ? 'Show confirmed' : 'Hide confirmed'"></button>
+    <button x-show="view === 'review'" @click="showAll = !showAll"
+            x-text="showAll ? 'Only flagged' : 'Show all'"></button>
+    <span class="note" x-show="message" x-text="message"></span>
+  </div>
+
+  <div class="banner" x-show="!writable && !loading">
+    Read-only preview. Run it locally to fetch new headlines and confirm categories.
+  </div>
+
+  <!-- ============ PREVIEW ============ -->
+  <template x-if="!loading && view === 'preview' && groups().length">
+    <div class="post">
+      <div class="byline" x-text="periodLabel()"></div>
+      <h1>Naslovi za proveru</h1>
+      <p class="lead" x-text="lead()"></p>
+
+      <template x-for="(group, i) in groups()" :key="'post-' + group.category">
+        <section>
+          <h4 x-text="`${i + 1}) ${NAMES[group.category]} - ${group.items.length} ${plural(group.items.length, 'naslov', 'naslova', 'naslova')}`"></h4>
+          <h5>Primeri:</h5>
+          <ul>
+            <template x-for="item in group.items.slice(0, 3)" :key="'p-' + item.url + item.headline">
+              <li>
+                <span x-text="'„' + item.headline + '“'"></span>
+                <span class="src">
+                  (<span x-text="formatLong(item.date)"></span>,
+                  <a :href="item.url" target="_blank" rel="noopener" x-text="item.outlet"></a>)
+                </span>
+              </li>
+            </template>
+          </ul>
+          <p class="more" x-show="group.items.length > 3"
+             x-text="`i još ${group.items.length - 3} ${plural(group.items.length - 3, 'naslov', 'naslova', 'naslova')} u ovoj kategoriji`"></p>
+        </section>
+      </template>
+
+      <p class="closing">
+        Oznaka je predlog za proveru, a ne ocena istinitosti teksta.
+        Svaki naslov pregleda i potvrđuje urednik.
+      </p>
+    </div>
+  </template>
+
+  <!-- ============ REVIEW ============ -->
+  <div x-show="view === 'review'">
+    <template x-for="day in reviewDays()" :key="day.date">
+      <section>
+        <div class="day" x-text="formatLong(day.date)"></div>
+        <template x-for="item in day.items" :key="item.url + item.headline">
+          <article class="card">
+            <div class="meta">
+              <span x-text="item.outlet"></span> ·
+              <a :href="item.url" target="_blank" rel="noopener">izvor</a>
+            </div>
+            <div class="headline" x-html="highlight(item)"></div>
+            <div class="row">
+              <span class="chip" :class="item.category !== 'nothing' ? 'flag' : ''" x-text="NAMES[item.category]"></span>
+              <template x-if="writable">
+                <span class="row">
+                  <span class="verified" x-show="item.verified">✓ potvrđeno</span>
+                  <button x-show="!item.verified" @click="setLabel(item, item.category)">Confirm</button>
+                  <select @change="setLabel(item, $event.target.value); $event.target.value = ''">
+                    <option value="">Change…</option>
+                    <template x-for="label in ALL" :key="label">
+                      <option :value="label" x-text="NAMES[label]"></option>
+                    </template>
+                  </select>
+                </span>
+              </template>
+            </div>
+          </article>
+        </template>
+      </section>
+    </template>
+  </div>
+
+  <div class="empty" x-show="loading">Učitavanje…</div>
+  <div class="empty" x-show="!loading && view === 'preview' && !groups().length">
+    Nema označenih naslova u ovom periodu.
+  </div>
+  <div class="empty" x-show="!loading && view === 'review' && !reviewDays().length">
+    Nema naslova za pregled.
+  </div>
+</div>
+
+<script>
+function radar() {
+  return {
+    items: [], loading: true, writable: false, busy: false, copied: false,
+    message: '', days: 7, view: 'preview', showAll: false, hideConfirmed: false,
+
+    ALL: ['vilifying_opponents', 'vilifying_neighbours', 'personality_cult', 'vilifying_eu', 'nothing'],
+    NAMES: {
+      vilifying_opponents: 'Demonizacija protivnika',
+      vilifying_neighbours: 'Demonizacija suseda',
+      personality_cult: 'Kult ličnosti',
+      vilifying_eu: 'Demonizacija EU',
+      nothing: 'Bez oznake',
+    },
+    MONTHS: ['januar', 'februar', 'mart', 'april', 'maj', 'jun',
+             'jul', 'avgust', 'septembar', 'oktobar', 'novembar', 'decembar'],
+
+    async load() {
+      this.loading = true;
+      try {
+        const r = await fetch('api/headlines');
+        if (!r.ok) throw new Error(r.status);
+        const data = await r.json();
+        this.items = data.headlines;
+        this.writable = data.writable;
+      } catch (e) {
+        try {
+          this.items = (await (await fetch('data.json')).json()).headlines;
+        } catch (e2) {
+          this.message = 'No data available.';
+        }
+        this.writable = false;
+      }
+      this.loading = false;
+    },
+
+    inPeriod(item) {
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - this.days);
+      return new Date(item.date) >= cutoff;
+    },
+
+    visible() {
+      return this.items.filter(i => this.inPeriod(i));
+    },
+
+    flagged() {
+      return this.visible().filter(i => i.category !== 'nothing');
+    },
+
+    groups() {
+      return this.ALL
+        .filter(l => l !== 'nothing')
+        .map(category => ({
+          category,
+          items: this.flagged()
+            .filter(i => i.category === category)
+            .sort((a, b) => (a.date < b.date ? 1 : -1)),
+        }))
+        .filter(g => g.items.length)
+        .sort((a, b) => b.items.length - a.items.length);
+    },
+
+    reviewDays() {
+      const pool = this.visible()
+        .filter(i => this.showAll || i.category !== 'nothing')
+        .filter(i => !(this.hideConfirmed && i.verified));
+      const dates = [...new Set(pool.map(i => i.date))].sort().reverse();
+      return dates.map(date => ({ date, items: pool.filter(i => i.date === date) }));
+    },
+
+    periodLabel() {
+      const dates = this.visible().map(i => i.date).sort();
+      if (!dates.length) return '';
+      return this.formatLong(dates[0]) + ' – ' + this.formatLong(dates[dates.length - 1]);
+    },
+
+    lead() {
+      const n = this.flagged().length;
+      const groups = this.groups();
+      const outlets = [...new Set(this.flagged().map(i => i.outlet))].length;
+      let text = `U ovom periodu Propaganda Radar je označio ${n} ` +
+                 `${this.plural(n, 'naslov', 'naslova', 'naslova')} za proveru, ` +
+                 `u ${outlets} ${this.plural(outlets, 'mediju', 'medija', 'medija')}.`;
+      if (groups.length) {
+        const top = groups.slice(0, 2).map(g => this.NAMES[g.category].toLowerCase());
+        text += ` Dominantni narativi bili su ${top.join(' i ')}.`;
+      }
+      return text;
+    },
+
+    plural(n, one, few, many) {
+      const d = n % 10, h = n % 100;
+      if (d === 1 && h !== 11) return one;
+      if (d >= 2 && d <= 4 && (h < 12 || h > 14)) return few;
+      return many;
+    },
+
+    formatLong(iso) {
+      const [y, m, d] = String(iso).split('-');
+      if (!d || !m) return iso;
+      return `${+d}. ${this.MONTHS[+m - 1]} ${y}.`;
+    },
+
+    escape(text) {
+      return text.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    },
+
+    highlight(item) {
+      if (!item.words.length) return this.escape(item.headline);
+      const alts = [...item.words]
+        .sort((a, b) => b.length - a.length)
+        .map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+        .join('|');
+      return item.headline
+        .split(new RegExp(`(${alts})`, 'g'))
+        .map((part, i) => (i % 2 ? `<mark>${this.escape(part)}</mark>` : this.escape(part)))
+        .join('');
+    },
+
+    async fetchLatest() {
+      this.busy = true;
+      this.message = '';
+      try {
+        const data = await (await fetch('api/fetch', { method: 'POST' })).json();
+        this.message = `+${data.added} new`;
+        await this.load();
+      } catch (e) {
+        this.message = 'Fetch failed.';
+      }
+      this.busy = false;
+    },
+
+    async setLabel(item, label) {
+      if (!label) return;
+      const body = { url: item.url, headline: item.headline, outlet: item.outlet, label };
+      const r = await fetch('api/label', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (r.ok) {
+        item.category = label;
+        item.verified = true;
+      } else {
+        this.message = 'Could not save.';
+      }
+    },
+
+    text() {
+      const lines = ['Naslovi za proveru', this.periodLabel(), '', this.lead(), ''];
+      this.groups().forEach((group, i) => {
+        const n = group.items.length;
+        lines.push(`${i + 1}) ${this.NAMES[group.category]} - ${n} ${this.plural(n, 'naslov', 'naslova', 'naslova')}`);
+        lines.push('Primeri:');
+        for (const item of group.items.slice(0, 3)) {
+          lines.push(`„${item.headline}“ (${this.formatLong(item.date)}, ${item.outlet})`);
+          lines.push(`  ${item.url}`);
+        }
+        if (n > 3) lines.push(`i još ${n - 3} ${this.plural(n - 3, 'naslov', 'naslova', 'naslova')} u ovoj kategoriji`);
+        lines.push('');
+      });
+      lines.push('Oznaka je predlog za proveru, a ne ocena istinitosti teksta.');
+      return lines.join('\n');
+    },
+
+    async copyText() {
+      try {
+        await navigator.clipboard.writeText(this.text());
+        this.copied = true;
+        setTimeout(() => (this.copied = false), 1500);
+      } catch (e) {
+        this.message = 'Copy failed.';
+      }
+    },
+  };
+}
+</script>
+</body>
+</html>

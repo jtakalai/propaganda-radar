@@ -56,7 +56,12 @@ class CsvStore:
         df = self.load()
         rows = [{**r, "outlet": canonical_outlet(r.get("outlet", ""))} for r in rows]
         seen = {tuple(t) for t in df[KEY].itertuples(index=False)}
-        new_rows = [r for r in rows if tuple(r[k] for k in KEY) not in seen]
+        new_rows = []
+        for r in rows:
+            key = tuple(r[k] for k in KEY)
+            if key not in seen:
+                seen.add(key)
+                new_rows.append(r)
         if new_rows:
             df = pd.concat([df, pd.DataFrame(new_rows, columns=COLUMNS)], ignore_index=True)
             self.save(df)
