@@ -6,10 +6,8 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from radar.config import FIGURES
-from radar.config import LABELS as LABEL_ORDER
+from radar.config import FIGURES, LABELS
 from radar.store import CsvStore
-
 
 pd.set_option("display.width", 120)
 pd.set_option("display.max_columns", None)
@@ -27,6 +25,7 @@ LABEL_COLORS = {
     "vilifying_eu": "#eda100",
     "nothing": INK_MUTED,
 }
+
 plt.rcParams.update(
     {
         "figure.facecolor": SURFACE,
@@ -37,15 +36,23 @@ plt.rcParams.update(
         "xtick.color": INK_SECONDARY,
         "ytick.color": INK_SECONDARY,
         "grid.color": GRIDLINE,
-        "font.family": "DejaVu Sans",  # covers Serbian Latin diacritics (š č ć ž đ)
+        "font.family": "DejaVu Sans",
         "axes.spines.top": False,
         "axes.spines.right": False,
     }
 )
 
 
+def section(title, gap="\n"):
+    print(f"{gap}{'=' * 60}\n{title}\n{'=' * 60}")
+
+
 def colors_for(labels):
     return [LABEL_COLORS.get(l, INK_MUTED) for l in labels]
+
+
+def present(labels):
+    return [l for l in LABELS if l in labels]
 
 
 def save(fig, name):
@@ -64,19 +71,13 @@ def load_data():
 
 
 store = load_data()
-crta = store[
-    store["labelled_by"] == "crta"
-]  # CRTA's own examples, verified, has cluster_id
-labels = store[store["labelled_by"].isin(["hand", "ui"])]  # ours, verified
-llm = store[store["labelled_by"].str.startswith(("claude", "llm"))]  # NOT verified
+crta = store[store["labelled_by"] == "crta"]
+labels = store[store["labelled_by"].isin(["hand", "ui"])]
+llm = store[store["labelled_by"].str.startswith(("claude", "llm"))]
 
-print("=" * 60)
-print("LOAD")
-print("=" * 60)
+section("LOAD", gap="")
 print(f"store total       : {len(store)} labelled rows")
-print(
-    f"  crta            : {len(crta)} outlet-rows, {crta['cluster_id'].nunique()} distinct headlines (verified)"
-)
+print(f"  crta            : {len(crta)} outlet-rows, {crta['cluster_id'].nunique()} distinct headlines (verified)")
 print(f"  hand / ui       : {len(labels)} rows (verified)")
 print(f"  llm             : {len(llm)} rows (NOT verified - the model's guesses)")
 
@@ -91,13 +92,9 @@ def all_headlines():
 
 def class_balance():
     crta_by_cluster = crta.drop_duplicates("cluster_id")
-    print("\n" + "=" * 60)
-    print("1. CLASS BALANCE")
-    print("=" * 60)
+    section("1. CLASS BALANCE")
 
-    print(
-        "\nCRTA examples, by distinct headline (not outlet-row, so repeats don't inflate this):"
-    )
+    print("\nCRTA examples, by distinct headline (not outlet-row, so repeats don't inflate this):")
     print(crta_by_cluster["label"].value_counts())
 
     print("\nOur own labels (verified, still small):")
@@ -106,17 +103,14 @@ def class_balance():
     print("\nLLM labels (NOT verified - the model's guesses, check before trusting):")
     print(llm["label"].value_counts())
 
-    fig, axes = plt.subplots(1, 3, figsize=(14, 4))
     panels = [
-        (
-            "CRTA examples\n(by distinct headline)",
-            crta_by_cluster["label"].value_counts(),
-        ),
+        ("CRTA examples\n(by distinct headline)", crta_by_cluster["label"].value_counts()),
         ("Our labels\n(verified)", labels["label"].value_counts()),
         ("LLM labels\n(NOT verified)", llm["label"].value_counts()),
     ]
+    fig, axes = plt.subplots(1, 3, figsize=(14, 4))
     for ax, (title, counts) in zip(axes, panels):
-        counts = counts.reindex([l for l in LABEL_ORDER if l in counts.index])
+        counts = counts.reindex(present(counts.index))
         ax.bar(counts.index, counts.values, color=colors_for(counts.index))
         ax.set_title(title, color=INK, fontsize=11)
         ax.tick_params(axis="x", rotation=30)
@@ -129,29 +123,21 @@ def class_balance():
 
 
 def near_duplicate_leakage():
-    print("\n" + "=" * 60)
-    print("2. NEAR-DUPLICATE LEAKAGE (CRTA examples - only source with cluster_id)")
-    print("=" * 60)
+    section("2. NEAR-DUPLICATE LEAKAGE (CRTA examples - only source with cluster_id)")
 
     cluster_sizes = crta.groupby("cluster_id").size()
     multi = (cluster_sizes > 1).sum()
-    print(
-        f"{multi}/{len(cluster_sizes)} headlines ({multi / len(cluster_sizes):.0%}) ran in >1 outlet the same day"
-    )
-    print(
-        f"mean outlets per headline: {cluster_sizes.mean():.2f}, max: {cluster_sizes.max()}"
-    )
+    print(f"{multi}/{len(cluster_sizes)} headlines ({multi / len(cluster_sizes):.0%}) ran in >1 outlet the same day")
+    print(f"mean outlets per headline: {cluster_sizes.mean():.2f}, max: {cluster_sizes.max()}")
     print("cluster size distribution:")
     print(cluster_sizes.value_counts().sort_index())
 
-    fig, ax = plt.subplots(figsize=(6, 4))
     vc = cluster_sizes.value_counts().sort_index()
+    fig, ax = plt.subplots(figsize=(6, 4))
     ax.bar(vc.index.astype(str), vc.values, color=LABEL_COLORS["vilifying_opponents"])
     ax.set_xlabel("outlets carrying the same headline")
     ax.set_ylabel("number of headlines")
-    ax.set_title(
-        "Cluster size: leakage if split by row, not by story", color=INK, fontsize=11
-    )
+    ax.set_title("Cluster size: leakage if split by row, not by story", color=INK, fontsize=11)
     ax.grid(axis="y", linewidth=0.6)
     ax.set_axisbelow(True)
     fig.tight_layout()
@@ -159,16 +145,10 @@ def near_duplicate_leakage():
 
 
 def outlet_label_crosstab():
-    print("\n" + "=" * 60)
-    print("3. OUTLET x LABEL (CRTA examples - only source with outlet variety so far)")
-    print("=" * 60)
+    section("3. OUTLET x LABEL (CRTA examples - only source with outlet variety so far)")
 
-    # outlet names are canonicalised on the way into the store (prepare/outlets.py),
-    # so no cleanup is needed here any more
     crosstab = pd.crosstab(crta["outlet"], crta["label"])
-    crosstab = crosstab.reindex(
-        columns=[l for l in LABEL_ORDER if l in crosstab.columns]
-    )
+    crosstab = crosstab.reindex(columns=present(crosstab.columns))
     crosstab = crosstab.loc[crosstab.sum(axis=1).sort_values(ascending=False).index]
     print(crosstab)
 
@@ -182,15 +162,8 @@ def outlet_label_crosstab():
         for j in range(crosstab.shape[1]):
             v = crosstab.values[i, j]
             if v:
-                ax.text(
-                    j,
-                    i,
-                    str(v),
-                    ha="center",
-                    va="center",
-                    color="white" if v > crosstab.values.max() / 2 else INK,
-                    fontsize=8,
-                )
+                color = "white" if v > crosstab.values.max() / 2 else INK
+                ax.text(j, i, str(v), ha="center", va="center", color=color, fontsize=8)
     ax.set_title("Outlet x label counts (CRTA examples)", color=INK, fontsize=11)
     fig.colorbar(im, ax=ax, shrink=0.8, label="count")
     fig.tight_layout()
@@ -198,20 +171,14 @@ def outlet_label_crosstab():
 
 
 def headline_length_by_label():
-    print("\n" + "=" * 60)
-    print("4. HEADLINE LENGTH BY LABEL (all sources combined)")
-    print("=" * 60)
+    section("4. HEADLINE LENGTH BY LABEL (all sources combined)")
 
     combined = all_headlines()
     combined["n_words"] = combined["headline"].str.split().str.len()
-    print(
-        combined.groupby("label")["n_words"].describe()[["count", "mean", "min", "max"]]
-    )
+    print(combined.groupby("label")["n_words"].describe()[["count", "mean", "min", "max"]])
 
-    present_labels = [l for l in LABEL_ORDER if l in combined["label"].unique()]
-    data_by_label = [
-        combined.loc[combined["label"] == l, "n_words"].values for l in present_labels
-    ]
+    present_labels = present(combined["label"].unique())
+    data_by_label = [combined.loc[combined["label"] == l, "n_words"].values for l in present_labels]
 
     fig, ax = plt.subplots(figsize=(7, 4))
     bp = ax.boxplot(data_by_label, tick_labels=present_labels, patch_artist=True)
@@ -230,58 +197,45 @@ def headline_length_by_label():
 
 
 def script_check():
-    print("\n" + "=" * 60)
-    print("5. SCRIPT CHECK (Cyrillic vs Latin, diacritics)")
-    print("=" * 60)
+    section("5. SCRIPT CHECK (Cyrillic vs Latin, diacritics)")
 
-    CYRILLIC_RE = re.compile(r"[Ѐ-ӿ]")
-    DIACRITIC_RE = re.compile(r"[šđčćžŠĐČĆŽ]")
+    cyrillic = re.compile(r"[Ѐ-ӿ]")
+    diacritic = re.compile(r"[šđčćžŠĐČĆŽ]")
     headlines = all_headlines()["headline"]
-    n_cyrillic = headlines.apply(lambda h: bool(CYRILLIC_RE.search(h))).sum()
-    n_diacritic = headlines.apply(lambda h: bool(DIACRITIC_RE.search(h))).sum()
+    n_cyrillic = headlines.apply(lambda h: bool(cyrillic.search(h))).sum()
+    n_diacritic = headlines.apply(lambda h: bool(diacritic.search(h))).sum()
     print(f"{n_cyrillic}/{len(headlines)} headlines contain any Cyrillic character")
-    print(
-        f"{n_diacritic}/{len(headlines)} headlines contain a Latin diacritic (š đ č ć ž)"
-    )
+    print(f"{n_diacritic}/{len(headlines)} headlines contain a Latin diacritic (š đ č ć ž)")
     print("-> everything we have so far is Latin script (all Kurir). Don't assume that")
-    print(
-        "   holds once RSS feeds from Cyrillic-first outlets (e.g. Politika, RTS) are added."
-    )
+    print("   holds once RSS feeds from Cyrillic-first outlets (e.g. Politika, RTS) are added.")
+
+
+STOPWORDS = set(
+    """
+    i u na za se je da su sa od do ne ali kao sto što će ce koji koja koje
+    ovaj ova ovo biti bio bila su iz pre posle ka o a ili pa te no nego
+    kako gde kada dok mu joj im ih ga je li se ce će samo već vec sve svih
+    svoj svoja svoje ono ona on oni njegov njena njihov jer bez pod nad
+    kod uz preko posebno godine godina dana meseca
+    """.split()
+)
+
+
+def tokens(headline):
+    words = re.findall(r"[A-Za-zČčĆćĐđŠšŽž]+", headline.lower())
+    return [w for w in words if w not in STOPWORDS and len(w) > 2]
 
 
 def top_words_per_category():
-    print("\n" + "=" * 60)
-    print("6. TOP WORDS PER CATEGORY (all sources, no stemming, small stopword list)")
-    print("=" * 60)
+    section("6. TOP WORDS PER CATEGORY (all sources, no stemming, small stopword list)")
 
     combined = all_headlines()
-    STOPWORDS = set(
-        """
-        i u na za se je da su sa od do ne ali kao sto što će ce koji koja koje
-        ovaj ova ovo biti bio bila su iz pre posle ka o a ili pa te no nego
-        kako gde kada dok mu joj im ih ga je li se ce će samo već vec sve svih
-        svoj svoja svoje ono ona on oni njegov njena njihov jer bez pod nad
-        kod uz preko posebno godine godina dana meseca
-        """.split()
-    )
-
-    def tokens(headline):
-        words = re.findall(r"[A-Za-zČčĆćĐđŠšŽž]+", headline.lower())
-        return [w for w in words if w not in STOPWORDS and len(w) > 2]
+    manipulations = [l for l in LABELS if l != "nothing"]
 
     fig, axes = plt.subplots(1, 4, figsize=(16, 4))
-    for ax, label in zip(
-        axes,
-        [
-            "vilifying_opponents",
-            "vilifying_neighbours",
-            "personality_cult",
-            "vilifying_eu",
-        ],
-    ):
+    for ax, label in zip(axes, manipulations):
         subset = combined.loc[combined["label"] == label, "headline"]
-        counter = Counter(w for h in subset for w in tokens(h))
-        top = counter.most_common(10)
+        top = Counter(w for h in subset for w in tokens(h)).most_common(10)
         print(f"\n{label} (n={len(subset)}):")
         for word, n in top:
             print(f"  {n:3d}  {word}")
@@ -290,11 +244,7 @@ def top_words_per_category():
             ax.barh(words, counts, color=LABEL_COLORS[label])
         ax.set_title(label, fontsize=9, color=INK)
         ax.tick_params(labelsize=8)
-    fig.suptitle(
-        "Top words per category (all sources, stopwords removed)",
-        color=INK,
-        fontsize=11,
-    )
+    fig.suptitle("Top words per category (all sources, stopwords removed)", color=INK, fontsize=11)
     fig.tight_layout()
     save(fig, "top-words")
 

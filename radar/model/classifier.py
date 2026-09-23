@@ -1,14 +1,7 @@
 """Classifier interface: predict(headline) -> (label, confidence, probabilities).
 
-This is rung 1 of CLAUDE.md's model ladder - keyword and entity rules (see
-rules.py). Later rungs (TF-IDF, embeddings, SetFit) replace the body of
-`predict` with the same signature, so radar/collect/rss.py and app/dashboard.py
-never need to change.
-
-`probabilities` is a score per label (they don't need to sum to 1 - whatever
-the model naturally produces). Here it is the number of rules that fired for
-each label; "nothing" scores 1 only when no rule fired. The dashboard shows
-these in a collapsed debug panel, not the main view.
+Later rungs of the ladder replace the body of `predict` with the same
+signature, so the collect scripts and the dashboard don't change.
 """
 
 import json

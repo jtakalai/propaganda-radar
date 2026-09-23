@@ -30,8 +30,6 @@ with st.sidebar:
     st.caption("By label:")
     st.dataframe(labelled["label"].value_counts(), width="stretch")
 
-# blank until labelled, then an instant right/wrong check against the model -
-# also the filter for "give me the training set": df[df["label"] != ""]
 df["match"] = df.apply(
     lambda r: "" if r["label"] == "" else ("✓" if r["label"] == r["predicted_label"] else "✗"),
     axis=1,
@@ -70,10 +68,16 @@ with right:
 
     st.markdown("**Correct label**")
     current = row["label"] or row["predicted_label"]
-    corrected = st.selectbox("label", LABELS, index=LABELS.index(current), key=f"label-{row['url']}", label_visibility="collapsed")
+    corrected = st.selectbox(
+        "label", LABELS, index=LABELS.index(current),
+        key=f"label-{row['url']}", label_visibility="collapsed",
+    )
 
     st.markdown("**Comment** - why is this right/wrong?")
-    comment = st.text_area("comment", value=row["comment"], key=f"comment-{row['url']}", label_visibility="collapsed")
+    comment = st.text_area(
+        "comment", value=row["comment"],
+        key=f"comment-{row['url']}", label_visibility="collapsed",
+    )
 
     if st.button("Save"):
         store.set_label(row, corrected, labelled_by="ui", comment=comment)

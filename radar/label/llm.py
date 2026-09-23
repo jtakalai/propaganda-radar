@@ -1,25 +1,15 @@
-"""Label headlines with an LLM instead of by hand - a real, shareable version
-of the ad-hoc "read each headline in chat and pick a category" process this
-project has been using. Shells out to the `claude` CLI (Claude Code) for
-structured output, so it rides on whatever Claude Code login you already
-have - no ANTHROPIC_API_KEY, no separate billing setup. Anyone on the team
-with `claude` installed and logged in can run this as-is.
+"""Label headlines with an LLM instead of by hand.
 
-    python scripts/label_llm.py                 # label everything still unlabelled
-    python scripts/label_llm.py --limit 20      # just the first 20 (still costs real money - try small first)
-    python scripts/label_llm.py --batch-size 20 # headlines per `claude` call (default 15) - bigger batches are cheaper per headline
+    python scripts/label_llm.py                 # everything still unlabelled
+    python scripts/label_llm.py --limit 20      # just the first 20
+    python scripts/label_llm.py --batch-size 20 # headlines per claude call
 
-Safe to re-run: only touches rows where label == "". To relabel rows already
-labelled by this script (to compare a prompt/model change against the old
-run), pass --relabel and it'll only touch rows whose labelled_by == "claude-code".
+Shells out to the `claude` CLI for structured output, so it uses whatever
+Claude Code login you already have. Only touches rows where label == "",
+unless --relabel, which takes the rows this script labelled before. Writes
+label + comment (reasoning and probabilities) + labelled_by="claude-code".
 
-Writes label + comment (reasoning and the full probability breakdown, for
-transparency into what the AI did) + labelled_by="claude-code", same shape
-as a human correcting a row through the dashboard.
-
-Cost note: each `claude` call reports its own spend; this script sums and
-prints it as it goes, and --max-budget-usd caps what any single call may
-spend (default 0.50) so a bad batch can't run away.
+Each call reports its spend; --max-budget-usd caps what one call may spend.
 """
 
 import argparse
@@ -105,7 +95,7 @@ def main():
     parser.add_argument("--max-budget-usd", type=float, default=0.50, help="cap per claude call (default 0.50)")
     parser.add_argument(
         "--relabel", action="store_true",
-        help="also relabel rows already labelled by this script (default: only label rows with label=='')",
+        help="relabel rows this script labelled before, instead of unlabelled rows",
     )
     args = parser.parse_args()
 

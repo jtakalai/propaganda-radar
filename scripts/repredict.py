@@ -2,9 +2,8 @@
 
     python scripts/repredict.py
 
-Run after changing radar/model/rules.py so the stored predictions (and the
-dashboard's match column) reflect the current model. Human labels are left
-untouched.
+Run after changing the rules so the stored predictions reflect the current
+model. Labels are left untouched.
 """
 
 import pandas as pd

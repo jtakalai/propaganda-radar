@@ -1,24 +1,23 @@
 """Scrape headlines from one site's RSS feed and label them by hand.
 
     python scripts/label_cli.py              # headlines only
-    python scripts/label_cli.py --translate  # also show an English gloss (Google Translate)
+    python scripts/label_cli.py --translate  # also show an English gloss
 
-Labels go straight into the canonical store as you go, so quitting never
-loses work and headlines you've already labelled are skipped next run.
-
-Hand labels are the only ones anybody has actually verified. They're marked
-labelled_by="hand" so the EDA can tell them apart from CRTA's own examples
-and from the LLM's guesses.
+Labels go straight into the store as you go, so quitting never loses work
+and headlines you've already labelled are skipped next run. They are marked
+labelled_by="hand".
 """
 
 import argparse
-import datetime
 import random
 
-from radar.model.classifier import prediction_columns
-from radar.store import CsvStore
+import feedparser
 
-FEED = "https://www.kurir.rs/rss/politika"  # politics section only; check in a browser first
+from radar.collect.rss import entry_date, entry_url
+from radar.model.classifier import prediction_columns
+from radar.store import CsvStore, new_row
+
+FEED = "https://www.kurir.rs/rss/politika"
 OUTLET = "Kurir"
 
 BUCKETS = {
@@ -30,34 +29,14 @@ BUCKETS = {
 }
 
 
-def entry_date(entry):
-    """Publish date as YYYY-MM-DD; fall back to today if the feed omits it."""
-    t = entry.get("published_parsed") or entry.get("updated_parsed")
-    if t:
-        return f"{t.tm_year:04d}-{t.tm_mon:02d}-{t.tm_mday:02d}"
-    return datetime.date.today().isoformat()
-
-
-def entry_url(entry):
-    """Article link; fall back to the guid, then the feed URL."""
-    return entry.get("link") or entry.get("id") or FEED
-
-
 def store_row(entry):
-    """A full store row for a feed entry, prediction included but unlabelled."""
-    return {
-        "outlet": OUTLET,
-        "date": entry_date(entry),
-        "headline": entry.title,
-        "url": entry_url(entry),
-        "summary": "",
+    return new_row(
+        outlet=OUTLET,
+        date=entry_date(entry),
+        headline=entry.title,
+        url=entry_url(entry, FEED),
         **prediction_columns(entry.title),
-        "label": "",
-        "comment": "",
-        "labelled_by": "",
-        "labelled_at": "",
-        "cluster_id": "",
-    }
+    )
 
 
 def make_translator():
@@ -66,7 +45,7 @@ def make_translator():
     def translate(text):
         try:
             return GoogleTranslator(source="sr", target="en").translate(text)
-        except Exception as e:  # network down, rate limit, etc.
+        except Exception as e:
             return f"(translation failed: {e})"
 
     return translate
@@ -87,8 +66,6 @@ def main():
     args = parser.parse_args()
 
     translate = make_translator() if args.translate else None
-
-    import feedparser
 
     feed = feedparser.parse(FEED)
     if not feed.entries:
@@ -111,7 +88,7 @@ def main():
     try:
         for i, entry in enumerate(todo, 1):
             print(f"[{i}/{len(todo)}] {entry.title}")
-            print(f"    {entry_url(entry)}")
+            print(f"    {entry_url(entry, FEED)}")
             if translate:
                 print(f"    en: {translate(entry.title)}")
             while True:

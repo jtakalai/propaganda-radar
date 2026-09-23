@@ -1,9 +1,8 @@
 """Rung 1: keyword and entity rules.
 
 A rule fires when all of its patterns match the normalised headline. Patterns
-are written against `normalise` output (lowercase, Latin, diacritics folded)
-and anchored at the word start only, so inflected forms match
-(blokader -> blokaderi, blokaderima).
+are written in normalised form and anchored at the word start, so inflected
+forms match (blokader -> blokaderi, blokaderima).
 """
 
 import re

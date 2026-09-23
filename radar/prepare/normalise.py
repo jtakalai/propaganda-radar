@@ -1,9 +1,4 @@
-"""Text normalisation shared by every rung of the model ladder.
-
-Serbian headlines come in Cyrillic, Latin, or a mix of both. `normalise` maps
-all of them to one form: lowercase Latin with diacritics folded (č ć -> c,
-š -> s, ž -> z, đ -> dj), so "ВУЧИЋ", "Vučić" and "Vucic" compare equal.
-"""
+"""Lowercase Latin with diacritics folded, from Cyrillic, Latin, or a mix."""
 
 import unicodedata
 

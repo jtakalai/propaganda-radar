@@ -1,10 +1,6 @@
 """Score the current classifier against every labelled headline.
 
     python scripts/evaluate.py
-
-Rung 0 (always "nothing") is the baseline the classifier has to beat. The
-rules were written while looking at these same headlines, so the numbers are
-optimistic - a rule-based rung has no train/test split to hold out.
 """
 
 import pandas as pd

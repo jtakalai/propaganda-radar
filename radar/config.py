@@ -1,9 +1,4 @@
-"""Paths and the label taxonomy - the one place either of them is defined.
-
-Before this module existed the five labels were spelled out in four separate
-files, so adding or renaming a category meant finding all four. Import from
-here instead.
-"""
+"""Paths and the label taxonomy - the one place either of them is defined."""
 
 from pathlib import Path
 
@@ -14,14 +9,8 @@ RAW = DATA / "raw"
 INTERIM = DATA / "interim"
 PROCESSED = DATA / "processed"
 
-# The canonical store: every headline we have ever seen, with its prediction
-# and its label if someone (or something) has given it one. See docs/data-dictionary.md.
 HEADLINES = PROCESSED / "headlines.csv"
-
-# Raw inputs, immutable once collected - never edit in place.
 BACKGROUND_HEADLINES = RAW / "background_headlines.csv"
-
-# Staging, safe to clobber.
 LLM_BATCH_PENDING = INTERIM / "llm_batch_pending.csv"
 
 FIGURES = ROOT / "reports" / "figures"
@@ -34,6 +23,4 @@ LABELS = [
     "nothing",
 ]
 
-# Everything that isn't the non-event class. "nothing" dominates at roughly a
-# 2% base rate, so most metrics are only meaningful over these four.
 MANIPULATIONS = [label for label in LABELS if label != "nothing"]
