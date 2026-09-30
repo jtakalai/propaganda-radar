@@ -30,9 +30,7 @@ written through `radar/store.py`; nothing touches the file directly.
 | `url`                  | The article. For CRTA rows, the monthly report plus a `#cluster-N` fragment     |
 | `summary`              | Feed snippet where the feed provides one. Kurir's usually doesn't — often empty |
 | `predicted_label`      | What the current model says                                                     |
-| `predicted_confidence` | Model's own confidence, comparable only within one `model_version`              |
-| `predicted_probs`      | JSON, a score per label. Need not sum to 1                                      |
-| `model_version`        | Which model produced the three columns above, e.g. `rung1-rules`                |
+| `model_version`        | Which model produced `predicted_label`, e.g. `rung1-rules`                      |
 | `label`                | The accepted label. Empty means nobody has judged it yet                        |
 | `comment`              | Why. The LLM writes its reasoning here; reviewers write their own               |
 | `labelled_by`          | Provenance — see below. The most important column in the file                   |
@@ -91,6 +89,14 @@ labelling.
 
 Staging only, rewritten by every `make batch`, gitignored. Columns:
 `outlet`, `date`, `headline`, `url`.
+
+## Columns that used to exist
+
+`predicted_confidence` and `predicted_probs` were dropped from the store. For
+rung 1 they were rule hit counts rather than probabilities, nothing read them
+except one dashboard panel, and `radar/evaluate/metrics.py` computes rung 2's
+ranking scores fresh with `cross_val_predict` instead of reading them back.
+`scripts/repredict.py` rebuilds `predicted_label` whenever the rules change.
 
 ## Files that used to exist
 

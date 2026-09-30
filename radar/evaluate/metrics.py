@@ -40,7 +40,7 @@ def precision_at_k(flagged: pd.Series, score: np.ndarray, k: int) -> float:
 
 def main():
     df = labelled(CsvStore().load()).drop_duplicates("headline").reset_index(drop=True)
-    df["rung1"] = [rung1_predict(h)[0] for h in df["headline"]]
+    df["rung1"] = [rung1_predict(h) for h in df["headline"]]
     df["rung2"], flag_score = rung2_cross_val(df)
 
     print(f"{len(df)} unique labelled headlines: {df['label'].value_counts().to_dict()}")
@@ -73,7 +73,7 @@ def main():
         print(f"  {outlet:<38}  {r1:.2f}   {r2:.2f}  (n={len(rows)})")
 
     background = pd.read_csv(BACKGROUND_HEADLINES)["Naslov"]
-    rate = (background.apply(lambda h: rung1_predict(h)[0]) != "nothing").mean()
+    rate = (background.apply(rung1_predict) != "nothing").mean()
     print(f"\nRung 1 flags {rate:.1%} of the {len(background)} unlabelled background headlines")
     print("  (not a false-positive rate - that file is pro-government tabloid politics, not a neutral pool)")
 

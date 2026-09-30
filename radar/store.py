@@ -19,8 +19,6 @@ COLUMNS = [
     "url",
     "summary",
     "predicted_label",
-    "predicted_confidence",
-    "predicted_probs",
     "model_version",
     "label",
     "comment",

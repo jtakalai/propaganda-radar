@@ -3,8 +3,6 @@
     streamlit run app/dashboard.py
 """
 
-import json
-
 import streamlit as st
 
 from radar.config import LABELS
@@ -84,7 +82,4 @@ with right:
         st.success("saved")
         st.rerun()
 
-    with st.expander("Debug: model output"):
-        st.caption(f"model: {row['model_version']}  ·  confidence: {row['predicted_confidence']}")
-        probs = json.loads(row["predicted_probs"] or "{}")
-        st.bar_chart(probs)
+    st.caption(f"model: {row['model_version']}")

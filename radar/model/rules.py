@@ -1,10 +1,3 @@
-"""Rung 1: keyword and entity rules.
-
-A rule fires when all of its patterns match the normalised headline. Patterns
-are written in normalised form and anchored at the word start, so inflected
-forms match (blokader -> blokaderi, blokaderima).
-"""
-
 import re
 from dataclasses import dataclass
 
@@ -16,9 +9,6 @@ class Rule:
     name: str
     label: str
     patterns: tuple[re.Pattern, ...]
-
-    def matches(self, normalised_headline: str) -> bool:
-        return all(p.search(normalised_headline) for p in self.patterns)
 
 
 def _rule(label: str, name: str, *patterns: str) -> Rule:
@@ -46,4 +36,4 @@ RULES = [
 
 def fired_rules(headline: str) -> list[Rule]:
     normalised = normalise(headline)
-    return [rule for rule in RULES if rule.matches(normalised)]
+    return [rule for rule in RULES if all(p.search(normalised) for p in rule.patterns)]
