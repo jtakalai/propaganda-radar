@@ -3,12 +3,14 @@ VENV := venv
 PIP := $(VENV)/bin/pip
 PYTHON_VENV := $(VENV)/bin/python
 
-.PHONY: help setup collect eda app web
+.PHONY: help setup collect train evaluate eda app web
 
 help:
 	@echo "Setup"
 	@echo "  make setup      create venv/ and install dependencies (idempotent)"
 	@echo "  make collect    pull the latest headlines from the RSS feeds"
+	@echo "  make train      fit rung 2 on every labelled headline"
+	@echo "  make evaluate   score the rungs against the labelled headlines"
 	@echo "  make eda        exploratory plots into reports/figures/"
 	@echo "  make app        open our Streamlit review dashboard"
 	@echo "  make web        serve the site for CRTA on http://127.0.0.1:8000"
@@ -20,6 +22,12 @@ setup:
 
 collect:
 	$(PYTHON_VENV) scripts/collect.py
+
+train:
+	$(PYTHON_VENV) scripts/train.py
+
+evaluate:
+	$(PYTHON_VENV) scripts/evaluate.py
 
 eda:
 	$(PYTHON_VENV) analysis/eda.py

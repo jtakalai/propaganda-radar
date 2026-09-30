@@ -14,6 +14,8 @@ BACKGROUND_HEADLINES = RAW / "background_headlines.csv"
 LLM_BATCH_PENDING = INTERIM / "llm_batch_pending.csv"
 
 FIGURES = ROOT / "reports" / "figures"
+MODELS = ROOT / "models"
+RUNG2 = MODELS / "rung2-tfidf.joblib"
 
 LABELS = [
     "vilifying_opponents",
