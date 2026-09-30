@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="sr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -116,17 +116,17 @@
   <template x-if="!loading && view === 'preview' && groups().length">
     <div class="post">
       <div class="byline" x-text="periodLabel()"></div>
-      <h1>Naslovi za proveru</h1>
+      <h1>Headlines to review</h1>
       <p class="lead" x-text="lead()"></p>
 
       <template x-for="(group, i) in groups()" :key="'post-' + group.category">
         <section>
-          <h4 x-text="`${i + 1}) ${NAMES[group.category]} - ${group.items.length} ${plural(group.items.length, 'naslov', 'naslova', 'naslova')}`"></h4>
-          <h5>Primeri:</h5>
+          <h4 x-text="`${i + 1}) ${NAMES[group.category]} - ${headlineCount(group.items.length)}`"></h4>
+          <h5>Examples:</h5>
           <ul>
             <template x-for="item in group.items.slice(0, 3)" :key="'p-' + item.url + item.headline">
               <li>
-                <span x-text="'„' + item.headline + '“'"></span>
+                <span x-text="'“' + item.headline + '”'"></span>
                 <span class="src">
                   (<span x-text="formatLong(item.date)"></span>,
                   <a :href="item.url" target="_blank" rel="noopener" x-text="item.outlet"></a>)
@@ -135,13 +135,13 @@
             </template>
           </ul>
           <p class="more" x-show="group.items.length > 3"
-             x-text="`i još ${group.items.length - 3} ${plural(group.items.length - 3, 'naslov', 'naslova', 'naslova')} u ovoj kategoriji`"></p>
+             x-text="`and ${group.items.length - 3} more in this category`"></p>
         </section>
       </template>
 
       <p class="closing">
-        Oznaka je predlog za proveru, a ne ocena istinitosti teksta.
-        Svaki naslov pregleda i potvrđuje urednik.
+        A label is a suggestion to check, not a verdict on whether the text is true.
+        Every headline is reviewed and confirmed by a person.
       </p>
     </div>
   </template>
@@ -154,14 +154,14 @@
           <article class="card">
             <div class="meta">
               <span x-text="item.outlet"></span> ·
-              <a :href="item.url" target="_blank" rel="noopener">izvor</a>
+              <a :href="item.url" target="_blank" rel="noopener">source</a>
             </div>
             <div class="headline" x-html="highlight(item)"></div>
             <div class="row">
               <span class="chip" :class="item.category !== 'nothing' ? 'flag' : ''" x-text="NAMES[item.category]"></span>
               <template x-if="writable">
                 <span class="row">
-                  <span class="verified" x-show="item.verified">✓ potvrđeno</span>
+                  <span class="verified" x-show="item.verified">✓ confirmed</span>
                   <button x-show="!item.verified" @click="setLabel(item, item.category)">Confirm</button>
                   <select @change="setLabel(item, $event.target.value); $event.target.value = ''">
                     <option value="">Change...</option>
@@ -178,12 +178,12 @@
     </template>
   </div>
 
-  <div class="empty" x-show="loading">Učitavanje...</div>
+  <div class="empty" x-show="loading">Loading...</div>
   <div class="empty" x-show="!loading && view === 'preview' && !groups().length">
-    Nema označenih naslova u ovom periodu.
+    No flagged headlines in this period.
   </div>
   <div class="empty" x-show="!loading && view === 'review' && !reviewDays().length">
-    Nema naslova za pregled.
+    No headlines to review.
   </div>
 </div>
 
@@ -195,14 +195,14 @@ function radar() {
 
     ALL: ['vilifying_opponents', 'vilifying_neighbours', 'personality_cult', 'vilifying_eu', 'nothing'],
     NAMES: {
-      vilifying_opponents: 'Demonizacija protivnika',
-      vilifying_neighbours: 'Demonizacija suseda',
-      personality_cult: 'Kult ličnosti',
-      vilifying_eu: 'Demonizacija EU',
-      nothing: 'Bez oznake',
+      vilifying_opponents: 'Vilifying opponents',
+      vilifying_neighbours: 'Vilifying neighbours',
+      personality_cult: 'Personality cult',
+      vilifying_eu: 'Vilifying the EU',
+      nothing: 'Not flagged',
     },
-    MONTHS: ['januar', 'februar', 'mart', 'april', 'maj', 'jun',
-             'jul', 'avgust', 'septembar', 'oktobar', 'novembar', 'decembar'],
+    MONTHS: ['January', 'February', 'March', 'April', 'May', 'June',
+             'July', 'August', 'September', 'October', 'November', 'December'],
 
     async load() {
       this.loading = true;
@@ -268,27 +268,25 @@ function radar() {
       const n = this.flagged().length;
       const groups = this.groups();
       const outlets = [...new Set(this.flagged().map(i => i.outlet))].length;
-      let text = `U ovom periodu Propaganda Radar je označio ${n} ` +
-                 `${this.plural(n, 'naslov', 'naslova', 'naslova')} za proveru, ` +
-                 `u ${outlets} ${this.plural(outlets, 'mediju', 'medija', 'medija')}.`;
+      let text = `Propaganda Radar flagged ${this.headlineCount(n)} for review in this period, ` +
+                 `across ${outlets} ${outlets === 1 ? 'outlet' : 'outlets'}.`;
       if (groups.length) {
         const top = groups.slice(0, 2).map(g => this.NAMES[g.category].toLowerCase());
-        text += ` Dominantni narativi bili su ${top.join(' i ')}.`;
+        text += top.length === 1
+          ? ` The dominant narrative was ${top[0]}.`
+          : ` The dominant narratives were ${top.join(' and ')}.`;
       }
       return text;
     },
 
-    plural(n, one, few, many) {
-      const d = n % 10, h = n % 100;
-      if (d === 1 && h !== 11) return one;
-      if (d >= 2 && d <= 4 && (h < 12 || h > 14)) return few;
-      return many;
+    headlineCount(n) {
+      return `${n} ${n === 1 ? 'headline' : 'headlines'}`;
     },
 
     formatLong(iso) {
       const [y, m, d] = String(iso).split('-');
       if (!d || !m) return iso;
-      return `${+d}. ${this.MONTHS[+m - 1]} ${y}.`;
+      return `${+d} ${this.MONTHS[+m - 1]} ${y}`;
     },
 
     escape(text) {
@@ -337,19 +335,19 @@ function radar() {
     },
 
     text() {
-      const lines = ['Naslovi za proveru', this.periodLabel(), '', this.lead(), ''];
+      const lines = ['Headlines to review', this.periodLabel(), '', this.lead(), ''];
       this.groups().forEach((group, i) => {
         const n = group.items.length;
-        lines.push(`${i + 1}) ${this.NAMES[group.category]} - ${n} ${this.plural(n, 'naslov', 'naslova', 'naslova')}`);
-        lines.push('Primeri:');
+        lines.push(`${i + 1}) ${this.NAMES[group.category]} - ${this.headlineCount(n)}`);
+        lines.push('Examples:');
         for (const item of group.items.slice(0, 3)) {
-          lines.push(`„${item.headline}“ (${this.formatLong(item.date)}, ${item.outlet})`);
+          lines.push(`“${item.headline}” (${this.formatLong(item.date)}, ${item.outlet})`);
           lines.push(`  ${item.url}`);
         }
-        if (n > 3) lines.push(`i još ${n - 3} ${this.plural(n - 3, 'naslov', 'naslova', 'naslova')} u ovoj kategoriji`);
+        if (n > 3) lines.push(`and ${n - 3} more in this category`);
         lines.push('');
       });
-      lines.push('Oznaka je predlog za proveru, a ne ocena istinitosti teksta.');
+      lines.push('A label is a suggestion to check, not a verdict on whether the text is true.');
       return lines.join('\n');
     },
 
