@@ -1,10 +1,9 @@
-"""Serve the review site: the preview, and the buttons behind it.
+"""Serve the review site and the endpoints behind it.
 
     python scripts/serve.py              # http://127.0.0.1:8000
     python scripts/serve.py --port 9000
 
-The store is read on every request, so anything fetched or corrected shows
-up on the next refresh. Corrections are saved with labelled_by="site".
+The store is read on every request; corrections are saved with labelled_by="site".
 """
 
 import argparse
@@ -19,8 +18,6 @@ from radar.store import CsvStore
 
 WEB = ROOT / "web"
 
-# The labels a person stood behind. LLM labels are deliberately not here:
-# the site shows the model's own prediction for those rows instead.
 VERIFIED_BY = {"crta", "hand", "site", "ui"}
 
 

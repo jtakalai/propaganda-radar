@@ -12,7 +12,7 @@
     --accent: #9a2a1f; --mark: #fbe6a2; --ok: #1c7a54; --chip: #f1eee6;
   }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
+    :root {
       --ink: #eceae4; --ink-soft: #b3afa6; --ink-faint: #85817a;
       --surface: #16150f; --card: #1e1d16; --line: #33312a;
       --accent: #e8887b; --mark: #6b5a1c; --ok: #6bbf95; --chip: #2a2921;
@@ -40,7 +40,6 @@
   .toggle button.on { background: var(--ink); color: var(--surface); }
   .note { font-size: 14px; color: var(--ink-soft); margin-left: auto; }
 
-  /* ---- preview: shaped after CRTA's monthly reports ---- */
   .post { max-width: 640px; margin: 0 auto; }
   .post h1 { font-family: Georgia, "Times New Roman", serif; font-size: 32px; line-height: 1.2; margin: 0 0 12px; }
   .post .byline { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); }
@@ -63,7 +62,6 @@
     margin-top: 34px; padding-top: 16px;
   }
 
-  /* ---- review: one card per headline, newest first ---- */
   .card {
     background: var(--card); border: 1px solid var(--line); border-radius: 10px;
     padding: 13px 16px; margin-bottom: 10px;
@@ -102,7 +100,7 @@
       <option value="99999">Everything</option>
     </select>
     <button class="primary" @click="fetchLatest()" x-show="writable" :disabled="busy"
-            x-text="busy ? 'Fetching…' : 'Fetch latest'"></button>
+            x-text="busy ? 'Fetching...' : 'Fetch latest'"></button>
     <button x-show="view === 'preview'" @click="copyText()" x-text="copied ? 'Copied' : 'Copy text'"></button>
     <button x-show="view === 'review'" @click="hideConfirmed = !hideConfirmed"
             x-text="hideConfirmed ? 'Show confirmed' : 'Hide confirmed'"></button>
@@ -115,7 +113,6 @@
     Read-only preview. Run it locally to fetch new headlines and confirm categories.
   </div>
 
-  <!-- ============ PREVIEW ============ -->
   <template x-if="!loading && view === 'preview' && groups().length">
     <div class="post">
       <div class="byline" x-text="periodLabel()"></div>
@@ -149,7 +146,6 @@
     </div>
   </template>
 
-  <!-- ============ REVIEW ============ -->
   <div x-show="view === 'review'">
     <template x-for="day in reviewDays()" :key="day.date">
       <section>
@@ -168,7 +164,7 @@
                   <span class="verified" x-show="item.verified">✓ potvrđeno</span>
                   <button x-show="!item.verified" @click="setLabel(item, item.category)">Confirm</button>
                   <select @change="setLabel(item, $event.target.value); $event.target.value = ''">
-                    <option value="">Change…</option>
+                    <option value="">Change...</option>
                     <template x-for="label in ALL" :key="label">
                       <option :value="label" x-text="NAMES[label]"></option>
                     </template>
@@ -182,7 +178,7 @@
     </template>
   </div>
 
-  <div class="empty" x-show="loading">Učitavanje…</div>
+  <div class="empty" x-show="loading">Učitavanje...</div>
   <div class="empty" x-show="!loading && view === 'preview' && !groups().length">
     Nema označenih naslova u ovom periodu.
   </div>
@@ -265,7 +261,7 @@ function radar() {
     periodLabel() {
       const dates = this.visible().map(i => i.date).sort();
       if (!dates.length) return '';
-      return this.formatLong(dates[0]) + ' – ' + this.formatLong(dates[dates.length - 1]);
+      return this.formatLong(dates[0]) + ' - ' + this.formatLong(dates[dates.length - 1]);
     },
 
     lead() {
