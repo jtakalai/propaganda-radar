@@ -1,7 +1,7 @@
 """Scrape headlines from one site's RSS feed and label them by hand.
 
-    python scripts/label_cli.py              # headlines only
-    python scripts/label_cli.py --translate  # also show an English gloss
+    python -m radar.label.cli              # headlines only
+    python -m radar.label.cli --translate  # also show an English gloss
 
 Labels go straight into the store as you go, so quitting never loses work
 and headlines you've already labelled are skipped next run. They are marked

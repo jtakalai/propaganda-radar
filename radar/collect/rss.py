@@ -1,7 +1,7 @@
 """Pull headlines from RSS feeds, classify them, and store the new ones.
 
-    python scripts/collect.py                  # single pull
-    python scripts/collect.py --interval 900   # keep polling (ctrl-c to stop)
+    python -m radar.collect.rss                  # single pull
+    python -m radar.collect.rss --interval 900   # keep polling (ctrl-c to stop)
 
 Safe to run repeatedly - headlines already in the store are skipped.
 """

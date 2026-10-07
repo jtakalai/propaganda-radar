@@ -3,13 +3,15 @@ VENV := venv
 PIP := $(VENV)/bin/pip
 PYTHON_VENV := $(VENV)/bin/python
 
-.PHONY: help setup collect train evaluate eda app web
+.PHONY: help setup collect label train repredict evaluate eda app web
 
 help:
 	@echo "Setup"
 	@echo "  make setup      create venv/ and install dependencies (idempotent)"
 	@echo "  make collect    pull the latest headlines from the RSS feeds"
+	@echo "  make label      hand-label the unlabelled headlines"
 	@echo "  make train      fit rung 2 on every labelled headline"
+	@echo "  make repredict  re-run rung 1 over the store after changing the rules"
 	@echo "  make evaluate   score the rungs against the labelled headlines"
 	@echo "  make eda        exploratory plots into reports/figures/"
 	@echo "  make app        open our Streamlit review dashboard"
@@ -21,13 +23,19 @@ setup:
 	$(PIP) install -r requirements-dev.txt
 
 collect:
-	$(PYTHON_VENV) scripts/collect.py
+	$(PYTHON_VENV) -m radar.collect.rss
+
+label:
+	$(PYTHON_VENV) -m radar.label.cli
 
 train:
-	$(PYTHON_VENV) scripts/train.py
+	$(PYTHON_VENV) -m radar.model.tfidf
+
+repredict:
+	$(PYTHON_VENV) -m radar.model.classifier
 
 evaluate:
-	$(PYTHON_VENV) scripts/evaluate.py
+	$(PYTHON_VENV) -m radar.evaluate
 
 eda:
 	$(PYTHON_VENV) analysis/eda.py
@@ -36,4 +44,4 @@ app:
 	$(PYTHON_VENV) -m streamlit run app/dashboard.py
 
 web:
-	$(PYTHON_VENV) scripts/serve.py
+	$(PYTHON_VENV) -m radar.web

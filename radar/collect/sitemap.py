@@ -1,7 +1,7 @@
 """Pull unlabelled headlines and dump them to a plain batch file.
 
-    python scripts/pull_batch.py              # latest from the RSS feed
-    python scripts/pull_batch.py --random 40  # 40 headlines spread across
+    python -m radar.collect.sitemap              # latest from the RSS feed
+    python -m radar.collect.sitemap --random 40  # 40 headlines spread across
                                               # random days in the archive
 
 The RSS feed only carries the last ~100 headlines, all from one news cycle.

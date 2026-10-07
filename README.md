@@ -29,6 +29,9 @@ make setup        # install dependencies
 make app          # the review dashboard
 ```
 
+Every task is a module behind `make`. `make evaluate` is
+`python -m radar.evaluate`, and the rest follow the same shape.
+
 ## Where things are
 
 ```
@@ -36,17 +39,18 @@ data/raw/          as collected, never edited by hand
 data/interim/      staging, safe to clobber
 data/processed/    headlines.csv — the one canonical dataset
 radar/             all the logic, laid out by data-lifecycle stage
+  store.py           the only reader/writer of headlines.csv
   collect/           2. RSS feeds, Kurir's sitemap archive
-  prepare/           3. script normalisation, outlet names
+  prepare.py         3. script normalisation, outlet names
   label/             3. hand-labelling CLI, LLM-assisted labelling
   model/             5. the rungs of the model ladder
-  evaluate/          5. precision and recall
+  evaluate.py        5. precision and recall
+  web.py             6. communicate — serves web/ and its three endpoints
 analysis/eda.py    4. explore — writes to reports/figures/
 app/dashboard.py   6. communicate — our own review UI, never shown to CRTA
 web/index.html     6. communicate — the site for CRTA; one file, no build step
-scripts/           entrypoints; `make` calls these
 archive/crta/      frozen — CRTA's examples and the scraper that got them
-docs/              data dictionary, course requirements
+docs/              course requirements, technical report
 ```
 
 ## Where it stands

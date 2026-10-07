@@ -1,15 +1,15 @@
 """Score the rungs of the ladder against every labelled headline.
 
-    python scripts/evaluate.py
+    python -m radar.evaluate
 """
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import StratifiedGroupKFold, cross_val_predict
+from sklearn.model_selection import StratifiedKFold, cross_val_predict
 
 from radar.config import BACKGROUND_HEADLINES, MANIPULATIONS
 from radar.model.classifier import predict as rung1_predict
-from radar.model.dataset import groups, labelled
+from radar.model.dataset import labelled
 from radar.model.tfidf import build
 from radar.store import CsvStore
 
@@ -23,8 +23,8 @@ def precision_recall(true: pd.Series, predicted: pd.Series) -> tuple[float, floa
 
 
 def rung2_cross_val(df) -> tuple[np.ndarray, np.ndarray]:
-    splitter = StratifiedGroupKFold(n_splits=FOLDS, shuffle=True, random_state=0)
-    split = list(splitter.split(df["headline"], df["label"], groups(df)))
+    splitter = StratifiedKFold(n_splits=FOLDS, shuffle=True, random_state=0)
+    split = list(splitter.split(df["headline"], df["label"]))
     predicted = cross_val_predict(build(), df["headline"], df["label"], cv=split)
     probabilities = cross_val_predict(
         build(), df["headline"], df["label"], cv=split, method="predict_proba"
@@ -44,7 +44,7 @@ def main():
     df["rung2"], flag_score = rung2_cross_val(df)
 
     print(f"{len(df)} unique labelled headlines: {df['label'].value_counts().to_dict()}")
-    print(f"rung 2 out-of-fold, {FOLDS} folds grouped by story\n")
+    print(f"rung 2 out-of-fold, {FOLDS} folds, exact duplicates dropped first\n")
 
     flagged = df["label"] != "nothing"
     print("Flagged at all (any manipulation)          precision  recall")

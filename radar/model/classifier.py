@@ -1,9 +1,12 @@
 import re
 from collections import Counter
 
+import pandas as pd
+
 from radar.config import LABELS
 from radar.model.rules import fired_rules
-from radar.prepare.normalise import normalise
+from radar.prepare import normalise
+from radar.store import CsvStore
 
 VERSION = "rung1-rules"
 
@@ -21,3 +24,21 @@ def explain(headline: str) -> list[str]:
 
 def prediction_columns(headline: str) -> dict:
     return {"predicted_label": predict(headline), "model_version": VERSION}
+
+
+def main():
+    """python -m radar.model.classifier - re-predict every stored headline.
+
+    Run after changing the rules so the stored predictions match the current
+    model. Labels are left untouched.
+    """
+    store = CsvStore()
+    df = store.load()
+    predictions = pd.DataFrame([prediction_columns(h) for h in df["headline"]], index=df.index)
+    df[predictions.columns] = predictions.astype(str)
+    store.save(df)
+    print(f"re-predicted {len(df)} headlines with {predictions['model_version'].iloc[0]}")
+
+
+if __name__ == "__main__":
+    main()

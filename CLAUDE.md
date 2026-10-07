@@ -70,18 +70,19 @@ spotlight presentation, or scoping. They are not needed for modelling work.
 ## Repo
 
 Run everything from the repo root; `make` lists the tasks. Layout mirrors the
-six lifecycle stages — see README.md for the tree and
-`docs/data-dictionary.md` for every column and where each file came from.
+six lifecycle stages — see README.md for the tree. The store's columns are
+listed in `radar/store.py`.
 
-- `radar/` — the package. `collect/` `prepare/` `label/` `model/` `evaluate/`
+- `radar/` — the package. `collect/` `label/` `model/` are directories;
+  `prepare.py` `evaluate.py` `web.py` `store.py` `config.py` are single modules
 - `data/processed/headlines.csv` — the one canonical dataset, via `radar/store.py`.
   Row identity is `(url, headline, outlet)`; `labelled_by` carries provenance
   and separates verified labels from the LLM's guesses
 - `data/raw/` — immutable
 - `archive/crta/` — frozen. CRTA's 162 example rows are already in the store
   (`labelled_by="crta"`); we aren't pulling from them again
-- `scripts/` — thin entrypoints, no logic
-- `app/dashboard.py`, `analysis/eda.py`, `tests/`
+- no `scripts/`; every task is `python -m radar.<module>` behind a `make` target
+- `app/dashboard.py`, `analysis/eda.py`
 
 Labels and paths live in `radar/config.py`. Don't re-spell them anywhere else.
 

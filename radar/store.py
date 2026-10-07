@@ -10,7 +10,7 @@ from pathlib import Path
 import pandas as pd
 
 from radar.config import HEADLINES
-from radar.prepare.outlets import canonical_outlet
+from radar.prepare import canonical_outlet
 
 COLUMNS = [
     "outlet",

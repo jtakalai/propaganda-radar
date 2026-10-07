@@ -1,8 +1,8 @@
 """Label headlines with an LLM instead of by hand.
 
-    python scripts/label_llm.py                 # everything still unlabelled
-    python scripts/label_llm.py --limit 20      # just the first 20
-    python scripts/label_llm.py --batch-size 20 # headlines per claude call
+    python -m radar.label.llm                 # everything still unlabelled
+    python -m radar.label.llm --limit 20      # just the first 20
+    python -m radar.label.llm --batch-size 20 # headlines per claude call
 
 Shells out to the `claude` CLI for structured output, so it uses whatever
 Claude Code login you already have. Only touches rows where label == "",

@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass
 
-from radar.prepare.normalise import normalise
+from radar.prepare import normalise
 
 
 @dataclass(frozen=True)

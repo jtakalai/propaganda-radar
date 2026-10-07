@@ -38,7 +38,7 @@ Decides whether anything later means anything.
 - Ladder: each rung beats the one below or we stop. Rungs 3-4 not started.
 - Rung 1 rules: precision 0.99, recall 0.45. Not held out.
   Per label: opponents 0.51, neighbours 0.29, eu 0.27, personality_cult 0.08.
-- Rung 2 TF-IDF char_wb 3-5 + logreg: 0.89 / 0.91, 5-fold.
+- Rung 2 TF-IDF char_wb 3-5 + logreg: 0.86 / 0.92, stratified 5-fold.
 - Three non-default params, one sentence each. Without balanced, 0.82 and it
   collapses to one label.
 - Rung 2 never predicts vilifying_eu (11 examples). Rung 1 catches 0.27.

@@ -1,7 +1,7 @@
 """Serve the review site and the endpoints behind it.
 
-    python scripts/serve.py              # http://127.0.0.1:8000
-    python scripts/serve.py --port 9000
+    python -m radar.web              # http://127.0.0.1:8000
+    python -m radar.web --port 9000
 
 The store is read on every request; corrections are saved with labelled_by="site".
 """

@@ -4,7 +4,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import make_pipeline
 
 from radar.config import LABELS, RUNG2
-from radar.prepare.normalise import normalise
+from radar.model.dataset import labelled
+from radar.prepare import normalise
+from radar.store import CsvStore
 
 VERSION = "rung2-tfidf"
 
@@ -44,3 +46,14 @@ def predict(headline: str) -> tuple[str, float, dict[str, float]]:
     scores = {label: float(probabilities.get(label, 0.0)) for label in LABELS}
     label = max(scores, key=scores.__getitem__)
     return label, scores[label], scores
+
+
+def main():
+    """python -m radar.model.tfidf - fit rung 2 on every labelled headline."""
+    df = labelled(CsvStore().load())
+    train(df["headline"], df["label"])
+    print(f"fitted on {len(df)} labelled rows -> {RUNG2}")
+
+
+if __name__ == "__main__":
+    main()
