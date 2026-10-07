@@ -3,7 +3,7 @@ VENV := venv
 PIP := $(VENV)/bin/pip
 PYTHON_VENV := $(VENV)/bin/python
 
-.PHONY: help setup collect label train repredict evaluate eda app web
+.PHONY: help setup collect label train evaluate eda app web
 
 help:
 	@echo "Setup"
@@ -11,7 +11,6 @@ help:
 	@echo "  make collect    pull the latest headlines from the RSS feeds"
 	@echo "  make label      hand-label the unlabelled headlines"
 	@echo "  make train      fit rung 2 on every labelled headline"
-	@echo "  make repredict  re-run rung 1 over the store after changing the rules"
 	@echo "  make evaluate   score the rungs against the labelled headlines"
 	@echo "  make eda        exploratory plots into reports/figures/"
 	@echo "  make app        open our Streamlit review dashboard"
@@ -30,9 +29,6 @@ label:
 
 train:
 	$(PYTHON_VENV) -m radar.model.tfidf
-
-repredict:
-	$(PYTHON_VENV) -m radar.model.classifier
 
 evaluate:
 	$(PYTHON_VENV) -m radar.evaluate
