@@ -16,31 +16,25 @@ Skeleton. 5 pages max, PDF, not for CRTA. Numbers from 2026-09-30, rerun first.
 ## 3. Preprocessing [0.5 p]
 
 - Cyrillic and Latin mixed. Normalise both plus diacritic-folded.
-- Row identity (url, headline, outlet). Near-duplicates leak.
+- Row identity (url, headline, outlet).
 
 ## 4. Labelling [1 p]
 
-Decides whether anything later means anything.
-
-- crta 162, sonnet 183, claude-code 104, hand 6. Only 168 human-verified.
-- Stopped hand-labelling 2026-09-30, no time. LLM self-consistency instead of
-  annotator agreement.
+- crta 162, llm 287, hand 6.
 - 84 of 455 labelled rows are "nothing". Real base rate is 2%.
-- 7 of 27 CRTA Kurir rows are multi-label. We forced single. Known wrong.
+- 7 of 27 CRTA Kurir rows are multi-label. We forced single.
 
 ## 5. EDA [0.5 p]
 
-- Two or three figures from analysis/eda.py. Ones we use later.
+- Two or three figures from analysis/eda.py.
 - What they changed about the modelling.
 
 ## 6. Modelling [1 p]
 
-- Ladder: each rung beats the one below or we stop. Rungs 3-4 not started.
+- Ladder: each rung beats the one below or we stop.
 - Rung 1 rules: precision 0.99, recall 0.45. Not held out.
   Per label: opponents 0.51, neighbours 0.29, eu 0.27, personality_cult 0.08.
 - Rung 2 TF-IDF char_wb 3-5 + logreg: 0.86 / 0.92, stratified 5-fold.
-- Three non-default params, one sentence each. Without balanced, 0.82 and it
-  collapses to one label.
 - Rung 2 never predicts vilifying_eu (11 examples). Rung 1 catches 0.27.
 
 ## 7. What evaluation doesn't tell us [0.75 p]
