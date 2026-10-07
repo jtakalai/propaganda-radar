@@ -1,3 +1,5 @@
+"""Rung 1: the keyword and entity rules, written in normalised form."""
+
 import re
 from dataclasses import dataclass
 

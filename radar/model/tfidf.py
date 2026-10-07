@@ -1,3 +1,5 @@
+"""Rung 2: character n-grams and logistic regression."""
+
 import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -49,7 +51,6 @@ def predict(headline: str) -> tuple[str, float, dict[str, float]]:
 
 
 def main():
-    """python -m radar.model.tfidf - fit rung 2 on every labelled headline."""
     df = labelled(CsvStore().load())
     train(df["headline"], df["label"])
     print(f"fitted on {len(df)} labelled rows -> {RUNG2}")

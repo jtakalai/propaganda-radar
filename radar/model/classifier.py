@@ -1,3 +1,5 @@
+"""Rung 1: predict from the rules, and name the words that fired."""
+
 import re
 from collections import Counter
 

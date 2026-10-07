@@ -1,16 +1,4 @@
-"""Label headlines with an LLM instead of by hand.
-
-    python -m radar.label.llm                 # everything still unlabelled
-    python -m radar.label.llm --limit 20      # just the first 20
-    python -m radar.label.llm --batch-size 20 # headlines per claude call
-
-Shells out to the `claude` CLI for structured output, so it uses whatever
-Claude Code login you already have. Only touches rows where label == "",
-unless --relabel, which takes the rows this script labelled before. Writes
-label + comment (reasoning and probabilities) + labelled_by="claude-code".
-
-Each call reports its spend; --max-budget-usd caps what one call may spend.
-"""
+"""Label headlines with the claude CLI instead of by hand."""
 
 import argparse
 import json
@@ -63,7 +51,6 @@ SCHEMA = {
 
 
 def classify_batch(headlines: list[str], max_budget_usd: float) -> tuple[list[dict], float]:
-    """Returns (classifications in input order, dollars spent on this call)."""
     prompt = "\n".join(f"{i}. {h}" for i, h in enumerate(headlines, 1))
     proc = subprocess.run(
         [

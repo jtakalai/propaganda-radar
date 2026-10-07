@@ -1,8 +1,4 @@
-"""CSV-backed storage for headlines, predictions, and labels.
-
-`config.HEADLINES` is the one canonical data file - everything reads and
-writes here, via CsvStore.upsert. Row identity is (url, headline, outlet).
-"""
+"""CSV-backed store for headlines, predictions and labels."""
 
 from datetime import datetime
 from pathlib import Path
@@ -31,7 +27,6 @@ KEY = ["url", "headline", "outlet"]
 
 
 def new_row(**values) -> dict:
-    """A store row with every column present; the ones not given are empty."""
     return {**dict.fromkeys(COLUMNS, ""), **values}
 
 
@@ -50,7 +45,6 @@ class CsvStore:
         df.to_csv(self.path, index=False)
 
     def upsert(self, rows: list[dict]) -> int:
-        """Append rows we don't already have. Returns count added."""
         df = self.load()
         rows = [{**r, "outlet": canonical_outlet(r.get("outlet", ""))} for r in rows]
         seen = {tuple(t) for t in df[KEY].itertuples(index=False)}
@@ -66,7 +60,6 @@ class CsvStore:
         return len(new_rows)
 
     def set_label(self, row, label: str, labelled_by: str, comment: str = "") -> None:
-        """Label the one row matching `row`'s KEY columns."""
         df = self.load()
         match = pd.Series(True, index=df.index)
         for column in KEY:

@@ -1,7 +1,4 @@
-"""Score the rungs of the ladder against every labelled headline.
-
-    python -m radar.evaluate
-"""
+"""Score the rungs of the ladder against the labelled headlines."""
 
 import numpy as np
 import pandas as pd

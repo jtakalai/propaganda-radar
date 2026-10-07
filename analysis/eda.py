@@ -1,4 +1,4 @@
-"""Analyze the data"""
+"""Exploratory counts and plots, written to reports/figures/."""
 
 import re
 from collections import Counter

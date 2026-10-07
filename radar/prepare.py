@@ -1,7 +1,4 @@
-"""Normalisation and canonical outlet names - lifecycle stage 3.
-
-normalise() gives lowercase Latin with diacritics folded, from Cyrillic,
-Latin, or a mix."""
+"""Script normalisation and canonical outlet names."""
 
 import unicodedata
 
@@ -41,6 +38,5 @@ _CANONICAL = {
 
 
 def canonical_outlet(name: str) -> str:
-    """Canonical spelling, or the name unchanged if we haven't seen it before."""
     key = normalise(name).strip().rstrip("!").strip()
     return _CANONICAL.get(key, name.strip())

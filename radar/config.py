@@ -1,4 +1,4 @@
-"""Paths and the label taxonomy - the one place either of them is defined."""
+"""Paths and the label taxonomy, defined nowhere else."""
 
 from pathlib import Path
 

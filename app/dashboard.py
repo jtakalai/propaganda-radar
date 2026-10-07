@@ -1,7 +1,4 @@
-"""Review UI: browse latest headlines, click one to see the prediction, relabel it.
-
-    streamlit run app/dashboard.py
-"""
+"""Streamlit review UI: browse headlines, see the prediction, relabel."""
 
 import streamlit as st
 

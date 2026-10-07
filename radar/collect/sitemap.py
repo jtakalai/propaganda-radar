@@ -1,14 +1,4 @@
-"""Pull unlabelled headlines and dump them to a plain batch file.
-
-    python -m radar.collect.sitemap              # latest from the RSS feed
-    python -m radar.collect.sitemap --random 40  # 40 headlines spread across
-                                              # random days in the archive
-
-The RSS feed only carries the last ~100 headlines, all from one news cycle.
---random samples Kurir's sitemap archive instead, so a batch can span many
-days. Headlines already in the store are dropped; the output file is staging
-and is overwritten each run.
-"""
+"""Pull unlabelled headlines from the sitemap archive into a batch file."""
 
 import argparse
 import csv
@@ -56,7 +46,6 @@ def list_monthly_sitemaps():
 
 
 def politika_urls_from_month(sitemap_url):
-    """The archived sitemaps carry <loc> + <lastmod> only, no title."""
     root = ET.fromstring(fetch(sitemap_url))
     out = []
     for url_el in root.findall(f"{NS}url"):
@@ -68,8 +57,8 @@ def politika_urls_from_month(sitemap_url):
 
 
 def fetch_headline(url, fallback_date):
-    """og:title is the un-truncated headline; datePublished beats lastmod."""
     page = fetch(url).decode("utf-8", errors="replace")
+    # og:title, not <title>, which Politika truncates
     m = re.search(r'<meta property="og:title" content="(.*?)"\s*/?>', page)
     if not m:
         return None

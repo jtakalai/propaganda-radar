@@ -1,10 +1,4 @@
-"""Serve the review site and the endpoints behind it.
-
-    python -m radar.web              # http://127.0.0.1:8000
-    python -m radar.web --port 9000
-
-The store is read on every request; corrections are saved with labelled_by="site".
-"""
+"""Serve the site for CRTA and the three endpoints behind it."""
 
 import argparse
 import json

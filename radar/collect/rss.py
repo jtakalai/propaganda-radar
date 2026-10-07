@@ -1,10 +1,4 @@
-"""Pull headlines from RSS feeds, classify them, and store the new ones.
-
-    python -m radar.collect.rss                  # single pull
-    python -m radar.collect.rss --interval 900   # keep polling (ctrl-c to stop)
-
-Safe to run repeatedly - headlines already in the store are skipped.
-"""
+"""Pull headlines from the RSS feeds, classify them, store the new ones."""
 
 import argparse
 import re
@@ -34,7 +28,6 @@ def entry_url(entry, feed_url: str) -> str:
 
 
 def entry_summary(entry) -> str:
-    """Strip HTML and collapse whitespace; often empty, feeds vary."""
     text = re.sub(r"<[^>]+>", " ", entry.get("summary", ""))
     return re.sub(r"\s+", " ", unescape(text)).strip()
 
