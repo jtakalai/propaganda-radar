@@ -38,7 +38,7 @@ Decides whether anything later means anything.
 - Ladder: each rung beats the one below or we stop. Rungs 3-4 not started.
 - Rung 1 rules: precision 0.99, recall 0.45. Not held out.
   Per label: opponents 0.51, neighbours 0.29, eu 0.27, personality_cult 0.08.
-- Rung 2 TF-IDF char_wb 3-5 + logreg: 0.89 / 0.91, grouped 5-fold.
+- Rung 2 TF-IDF char_wb 3-5 + logreg: 0.89 / 0.91, 5-fold.
 - Three non-default params, one sentence each. Without balanced, 0.82 and it
   collapses to one label.
 - Rung 2 never predicts vilifying_eu (11 examples). Rung 1 catches 0.27.
@@ -49,7 +49,9 @@ Decides whether anything later means anything.
 - Precision@k is 1.00 everywhere, meaningless on a 77% positive set.
 - 0.99 is a number about a curated set, never deployment precision.
 - No held-out split. No leave-one-outlet-out, which is the number that matters.
-- cluster_id only on CRTA rows, so grouped splits miss the RSS headlines.
+- The grouped split groups nothing. CRTA clusters are one headline string
+  repeated across outlets, so the dedupe removes them before groups() runs.
+  All 369 rows end up their own group. Near-duplicate leakage is unhandled.
 
 ## 8. The app [0.75 p]
 
