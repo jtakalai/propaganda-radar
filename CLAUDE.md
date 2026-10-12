@@ -82,7 +82,7 @@ listed in `radar/store.py`.
 - `archive/crta/` — frozen. CRTA's 162 example rows are already in the store
   (`labelled_by="crta"`); we aren't pulling from them again
 - no `scripts/`; every task is `python -m radar.<module>` behind a `make` target
-- `app/dashboard.py`, `analysis/eda.py`
+- `analysis/eda.py`
 
 Labels and paths live in `radar/config.py`. Don't re-spell them anywhere else.
 

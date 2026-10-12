@@ -9,7 +9,7 @@ here is coverage, not speed** — we're competing against no coverage, not
 against their coders.
 
 A flag is not a verdict. Every flag shows which rule fired, and a person
-accepts or rejects it in the dashboard.
+accepts or rejects it on the site.
 
 ## Categories
 
@@ -26,7 +26,7 @@ accepts or rejects it in the dashboard.
 ```sh
 make              # lists every task
 make setup        # install dependencies
-make app          # the review dashboard
+make web          # the site, on http://127.0.0.1:8000
 ```
 
 Every task is a module behind `make`. `make evaluate` is
@@ -47,7 +47,6 @@ radar/             all the logic, laid out by data-lifecycle stage
   evaluate.py        5. precision and recall
   web.py             6. communicate — serves web/ and its three endpoints
 analysis/eda.py    4. explore — writes to reports/figures/
-app/dashboard.py   6. communicate — our own review UI, never shown to CRTA
 web/index.html     6. communicate — the site for CRTA; one file, no build step
 archive/crta/      frozen — CRTA's examples and the scraper that got them
 docs/              course requirements, technical report

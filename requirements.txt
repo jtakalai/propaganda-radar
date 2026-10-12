@@ -2,6 +2,5 @@ pandas
 scikit-learn
 matplotlib
 feedparser
-streamlit
 deep-translator
 pytest

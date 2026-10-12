@@ -3,7 +3,7 @@ VENV := venv
 PIP := $(VENV)/bin/pip
 PYTHON_VENV := $(VENV)/bin/python
 
-.PHONY: help setup collect label train evaluate eda app web
+.PHONY: help setup collect label train evaluate eda web
 
 help:
 	@echo "Setup"
@@ -13,7 +13,6 @@ help:
 	@echo "  make train      fit rung 2 on every labelled headline"
 	@echo "  make evaluate   score the rungs against the labelled headlines"
 	@echo "  make eda        exploratory plots into reports/figures/"
-	@echo "  make app        open our Streamlit review dashboard"
 	@echo "  make web        serve the site for CRTA on http://127.0.0.1:8000"
 
 setup:
@@ -35,9 +34,6 @@ evaluate:
 
 eda:
 	$(PYTHON_VENV) analysis/eda.py
-
-app:
-	$(PYTHON_VENV) -m streamlit run app/dashboard.py
 
 web:
 	$(PYTHON_VENV) -m radar.web
