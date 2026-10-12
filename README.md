@@ -35,23 +35,19 @@ Every task is a module behind `make`. `make evaluate` is
 ## Where things are
 
 ```
-data/raw/          as collected, never edited by hand
-data/interim/      staging, safe to clobber
-data/processed/    headlines.csv — the one canonical dataset
-radar/             all the logic, laid out by data-lifecycle stage
-  store.py           the only reader/writer of headlines.csv
-  collect/           2. RSS feeds, Kurir's sitemap archive
-  prepare.py         3. script normalisation, outlet names
-  label/             3. hand-labelling CLI, LLM-assisted labelling
-  model/             5. the rungs of the model ladder
-  evaluate.py        5. precision and recall
-  web.py             6. communicate — serves web/, or freezes it to data.json
-analysis/eda.py    4. explore — writes to reports/figures/
-web/index.html     6. communicate — the site for CRTA; one file, no build step
-web/data.json      the store, frozen by `make export`; what the deploy serves
-archive/crta/      frozen — CRTA's examples and the scraper that got them
-docs/              course requirements, technical report
+data/processed/headlines.csv   every headline we have, with its label
+data/raw/                      as collected, never edited by hand
+radar/                         all the code
+radar/store.py                 the only code that reads or writes headlines.csv
+radar/web.py                   serves web/, and writes web/data.json for the deploy
+analysis/eda.py                the plots in reports/figures/
+web/index.html                 the site, one file, no build step
+archive/crta/                  CRTA's examples and the scraper that got them, frozen
+docs/                          course requirements and the technical report
 ```
+
+The modules under `radar/` follow the six stages in
+[docs/data-lifecycle.md](docs/data-lifecycle.md).
 
 ## Where it stands
 
