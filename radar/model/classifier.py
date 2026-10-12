@@ -17,7 +17,11 @@ def predict(headline: str) -> str:
 
 def explain(headline: str) -> list[str]:
     patterns = [p for rule in fired_rules(headline) for p in rule.patterns]
-    matched = (w for w in re.findall(r"\w+", headline) if any(p.search(normalise(w)) for p in patterns))
+    matched = (
+        w
+        for w in re.findall(r"\w+", headline)
+        if any(p.search(normalise(w)) for p in patterns)
+    )
     return list(dict.fromkeys(matched))
 
 

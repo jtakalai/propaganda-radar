@@ -40,7 +40,9 @@ def main():
     df["rung1"] = [rung1_predict(h) for h in df["headline"]]
     df["rung2"], flag_score = rung2_cross_val(df)
 
-    print(f"{len(df)} unique labelled headlines: {df['label'].value_counts().to_dict()}")
+    print(
+        f"{len(df)} unique labelled headlines: {df['label'].value_counts().to_dict()}"
+    )
     print(f"rung 2 out-of-fold, {FOLDS} folds, exact duplicates dropped first\n")
 
     flagged = df["label"] != "nothing"
@@ -48,7 +50,9 @@ def main():
     print("  rung 0  always nothing                      -        0.00")
     for rung, note in (("rung1", "  (not held out)"), ("rung2", "")):
         p, r = precision_recall(flagged, df[rung] != "nothing")
-        print(f"  {rung}                                    {p:.2f}       {r:.2f}{note}")
+        print(
+            f"  {rung}                                    {p:.2f}       {r:.2f}{note}"
+        )
 
     print("\nPer label                       rung1 p/r   rung2 p/r   support")
     for label in MANIPULATIONS:
@@ -71,8 +75,12 @@ def main():
 
     background = pd.read_csv(BACKGROUND_HEADLINES)["Naslov"]
     rate = (background.apply(rung1_predict) != "nothing").mean()
-    print(f"\nRung 1 flags {rate:.1%} of the {len(background)} unlabelled background headlines")
-    print("  (not a false-positive rate - that file is pro-government tabloid politics, not a neutral pool)")
+    print(
+        f"\nRung 1 flags {rate:.1%} of the {len(background)} unlabelled background headlines"
+    )
+    print(
+        "  (not a false-positive rate - that file is pro-government tabloid politics, not a neutral pool)"
+    )
 
 
 if __name__ == "__main__":

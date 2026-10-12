@@ -77,7 +77,9 @@ llm = store[store["labelled_by"].str.startswith(("claude", "llm"))]
 
 section("LOAD", gap="")
 print(f"store total       : {len(store)} labelled rows")
-print(f"  crta            : {len(crta)} outlet-rows, {crta['cluster_id'].nunique()} distinct headlines (verified)")
+print(
+    f"  crta            : {len(crta)} outlet-rows, {crta['cluster_id'].nunique()} distinct headlines (verified)"
+)
 print(f"  hand / ui       : {len(labels)} rows (verified)")
 print(f"  llm             : {len(llm)} rows (NOT verified - the model's guesses)")
 
@@ -94,7 +96,9 @@ def class_balance():
     crta_by_cluster = crta.drop_duplicates("cluster_id")
     section("1. CLASS BALANCE")
 
-    print("\nCRTA examples, by distinct headline (not outlet-row, so repeats don't inflate this):")
+    print(
+        "\nCRTA examples, by distinct headline (not outlet-row, so repeats don't inflate this):"
+    )
     print(crta_by_cluster["label"].value_counts())
 
     print("\nOur own labels (verified, still small):")
@@ -104,7 +108,10 @@ def class_balance():
     print(llm["label"].value_counts())
 
     panels = [
-        ("CRTA examples\n(by distinct headline)", crta_by_cluster["label"].value_counts()),
+        (
+            "CRTA examples\n(by distinct headline)",
+            crta_by_cluster["label"].value_counts(),
+        ),
         ("Our labels\n(verified)", labels["label"].value_counts()),
         ("LLM labels\n(NOT verified)", llm["label"].value_counts()),
     ]
@@ -127,8 +134,12 @@ def near_duplicate_leakage():
 
     cluster_sizes = crta.groupby("cluster_id").size()
     multi = (cluster_sizes > 1).sum()
-    print(f"{multi}/{len(cluster_sizes)} headlines ({multi / len(cluster_sizes):.0%}) ran in >1 outlet the same day")
-    print(f"mean outlets per headline: {cluster_sizes.mean():.2f}, max: {cluster_sizes.max()}")
+    print(
+        f"{multi}/{len(cluster_sizes)} headlines ({multi / len(cluster_sizes):.0%}) ran in >1 outlet the same day"
+    )
+    print(
+        f"mean outlets per headline: {cluster_sizes.mean():.2f}, max: {cluster_sizes.max()}"
+    )
     print("cluster size distribution:")
     print(cluster_sizes.value_counts().sort_index())
 
@@ -137,7 +148,9 @@ def near_duplicate_leakage():
     ax.bar(vc.index.astype(str), vc.values, color=LABEL_COLORS["vilifying_opponents"])
     ax.set_xlabel("outlets carrying the same headline")
     ax.set_ylabel("number of headlines")
-    ax.set_title("Cluster size: leakage if split by row, not by story", color=INK, fontsize=11)
+    ax.set_title(
+        "Cluster size: leakage if split by row, not by story", color=INK, fontsize=11
+    )
     ax.grid(axis="y", linewidth=0.6)
     ax.set_axisbelow(True)
     fig.tight_layout()
@@ -145,7 +158,9 @@ def near_duplicate_leakage():
 
 
 def outlet_label_crosstab():
-    section("3. OUTLET x LABEL (CRTA examples - only source with outlet variety so far)")
+    section(
+        "3. OUTLET x LABEL (CRTA examples - only source with outlet variety so far)"
+    )
 
     crosstab = pd.crosstab(crta["outlet"], crta["label"])
     crosstab = crosstab.reindex(columns=present(crosstab.columns))
@@ -175,10 +190,14 @@ def headline_length_by_label():
 
     combined = all_headlines()
     combined["n_words"] = combined["headline"].str.split().str.len()
-    print(combined.groupby("label")["n_words"].describe()[["count", "mean", "min", "max"]])
+    print(
+        combined.groupby("label")["n_words"].describe()[["count", "mean", "min", "max"]]
+    )
 
     present_labels = present(combined["label"].unique())
-    data_by_label = [combined.loc[combined["label"] == l, "n_words"].values for l in present_labels]
+    data_by_label = [
+        combined.loc[combined["label"] == l, "n_words"].values for l in present_labels
+    ]
 
     fig, ax = plt.subplots(figsize=(7, 4))
     bp = ax.boxplot(data_by_label, tick_labels=present_labels, patch_artist=True)
@@ -205,9 +224,13 @@ def script_check():
     n_cyrillic = headlines.apply(lambda h: bool(cyrillic.search(h))).sum()
     n_diacritic = headlines.apply(lambda h: bool(diacritic.search(h))).sum()
     print(f"{n_cyrillic}/{len(headlines)} headlines contain any Cyrillic character")
-    print(f"{n_diacritic}/{len(headlines)} headlines contain a Latin diacritic (š đ č ć ž)")
+    print(
+        f"{n_diacritic}/{len(headlines)} headlines contain a Latin diacritic (š đ č ć ž)"
+    )
     print("-> everything we have so far is Latin script (all Kurir). Don't assume that")
-    print("   holds once RSS feeds from Cyrillic-first outlets (e.g. Politika, RTS) are added.")
+    print(
+        "   holds once RSS feeds from Cyrillic-first outlets (e.g. Politika, RTS) are added."
+    )
 
 
 STOPWORDS = set(
@@ -244,7 +267,11 @@ def top_words_per_category():
             ax.barh(words, counts, color=LABEL_COLORS[label])
         ax.set_title(label, fontsize=9, color=INK)
         ax.tick_params(labelsize=8)
-    fig.suptitle("Top words per category (all sources, stopwords removed)", color=INK, fontsize=11)
+    fig.suptitle(
+        "Top words per category (all sources, stopwords removed)",
+        color=INK,
+        fontsize=11,
+    )
     fig.tight_layout()
     save(fig, "top-words")
 

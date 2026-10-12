@@ -8,6 +8,7 @@ import pandas as pd
 from radar.config import HEADLINES
 from radar.prepare import canonical_outlet
 
+
 COLUMNS = [
     "outlet",
     "date",
@@ -55,7 +56,9 @@ class CsvStore:
                 seen.add(key)
                 new_rows.append(r)
         if new_rows:
-            df = pd.concat([df, pd.DataFrame(new_rows, columns=COLUMNS)], ignore_index=True)
+            df = pd.concat(
+                [df, pd.DataFrame(new_rows, columns=COLUMNS)], ignore_index=True
+            )
             self.save(df)
         return len(new_rows)
 

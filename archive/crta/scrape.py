@@ -57,10 +57,18 @@ MONTH_NAMES = {
     name: i
     for i, names in enumerate(
         [
-            ["januar", "januara"], ["februar", "februara"], ["mart", "marta"],
-            ["april", "aprila"], ["maj", "maja"], ["jun", "juna"],
-            ["jul", "jula"], ["avgust", "avgusta"], ["septembar", "septembra"],
-            ["oktobar", "oktobra"], ["novembar", "novembra"], ["decembar", "decembra"],
+            ["januar", "januara"],
+            ["februar", "februara"],
+            ["mart", "marta"],
+            ["april", "aprila"],
+            ["maj", "maja"],
+            ["jun", "juna"],
+            ["jul", "jula"],
+            ["avgust", "avgusta"],
+            ["septembar", "septembra"],
+            ["oktobar", "oktobra"],
+            ["novembar", "novembra"],
+            ["decembar", "decembra"],
         ],
         start=1,
     )

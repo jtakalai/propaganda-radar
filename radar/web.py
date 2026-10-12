@@ -82,7 +82,9 @@ def main():
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
 
-    server = ThreadingHTTPServer(("127.0.0.1", args.port), partial(Handler, directory=str(WEB)))
+    server = ThreadingHTTPServer(
+        ("127.0.0.1", args.port), partial(Handler, directory=str(WEB))
+    )
     print(f"serving {WEB} on http://127.0.0.1:{args.port}  (ctrl-c to stop)")
     try:
         server.serve_forever()

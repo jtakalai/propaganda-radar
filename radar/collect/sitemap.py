@@ -67,7 +67,11 @@ def fetch_headline(url, fallback_date):
     date_m = re.search(r'"datePublished"\s*:\s*"(\d{4}-\d{2}-\d{2})', page)
     if date_m:
         date = date_m.group(1)
-    return {"headline": headline, "url": url, "date": date or datetime.date.today().isoformat()}
+    return {
+        "headline": headline,
+        "url": url,
+        "date": date or datetime.date.today().isoformat(),
+    }
 
 
 def pull_random(n):
@@ -128,7 +132,14 @@ def main():
         w = csv.DictWriter(f, fieldnames=["outlet", "date", "headline", "url"])
         w.writeheader()
         for c in todo:
-            w.writerow({"outlet": OUTLET, "date": c["date"], "headline": c["headline"], "url": c["url"]})
+            w.writerow(
+                {
+                    "outlet": OUTLET,
+                    "date": c["date"],
+                    "headline": c["headline"],
+                    "url": c["url"],
+                }
+            )
 
     print(f"{len(candidates)} pulled, {len(todo)} unlabelled -> {LLM_BATCH_PENDING}")
 
