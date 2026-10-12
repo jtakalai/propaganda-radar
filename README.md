@@ -45,9 +45,10 @@ radar/             all the logic, laid out by data-lifecycle stage
   label/             3. hand-labelling CLI, LLM-assisted labelling
   model/             5. the rungs of the model ladder
   evaluate.py        5. precision and recall
-  web.py             6. communicate — serves web/ and its three endpoints
+  web.py             6. communicate — serves web/, or freezes it to data.json
 analysis/eda.py    4. explore — writes to reports/figures/
 web/index.html     6. communicate — the site for CRTA; one file, no build step
+web/data.json      the store, frozen by `make export`; what the deploy serves
 archive/crta/      frozen — CRTA's examples and the scraper that got them
 docs/              course requirements, technical report
 ```

@@ -3,7 +3,7 @@ VENV := venv
 PIP := $(VENV)/bin/pip
 PYTHON_VENV := $(VENV)/bin/python
 
-.PHONY: help setup collect label train evaluate eda web
+.PHONY: help setup collect label train evaluate eda web export
 
 help:
 	@echo "Setup"
@@ -14,6 +14,7 @@ help:
 	@echo "  make evaluate   score the rungs against the labelled headlines"
 	@echo "  make eda        exploratory plots into reports/figures/"
 	@echo "  make web        serve the site for CRTA on http://127.0.0.1:8000"
+	@echo "  make export     re-render web/data.json after the store changes"
 
 setup:
 	$(PYTHON) -m venv $(VENV)
@@ -37,3 +38,6 @@ eda:
 
 web:
 	$(PYTHON_VENV) -m radar.web
+
+export:
+	$(PYTHON_VENV) -m radar.web --export

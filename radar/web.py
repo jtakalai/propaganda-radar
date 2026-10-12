@@ -1,4 +1,4 @@
-"""Serve the site for CRTA and the three endpoints behind it."""
+"""Serve the site for CRTA, or freeze it to data.json for a static deploy."""
 
 import argparse
 import json
@@ -11,6 +11,7 @@ from radar.model.classifier import explain
 from radar.store import CsvStore
 
 WEB = ROOT / "web"
+DATA = WEB / "data.json"
 
 VERIFIED_BY = {"crta", "hand", "site", "ui"}
 
@@ -48,6 +49,14 @@ def save_label(payload: dict) -> dict:
     return {"ok": True}
 
 
+def export() -> None:
+    rows = headlines()
+    DATA.write_text(
+        json.dumps({"headlines": rows}, ensure_ascii=False), encoding="utf-8"
+    )
+    print(f"wrote {len(rows)} headlines -> {DATA}")
+
+
 class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.split("?")[0] == "/api/headlines":
@@ -80,7 +89,16 @@ class Handler(SimpleHTTPRequestHandler):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8000)
+    parser.add_argument(
+        "--export",
+        action="store_true",
+        help="write web/data.json and exit, instead of serving",
+    )
     args = parser.parse_args()
+
+    if args.export:
+        export()
+        return
 
     server = ThreadingHTTPServer(
         ("127.0.0.1", args.port), partial(Handler, directory=str(WEB))
