@@ -13,14 +13,12 @@ from radar.store import CsvStore
 WEB = ROOT / "web"
 DATA = WEB / "data.json"
 
-VERIFIED_BY = {"crta", "hand", "site", "ui"}
-
 
 def headlines() -> list[dict]:
     df = CsvStore().load()
     rows = []
     for row in df.to_dict("records"):
-        verified = row["labelled_by"] in VERIFIED_BY
+        verified = row["confirmed"] == "yes"
         category = row["label"] if verified else row["predicted_label"]
         if not category:
             continue
@@ -45,7 +43,7 @@ def fetch_latest() -> dict:
 def save_label(payload: dict) -> dict:
     if payload.get("label") not in LABELS:
         raise ValueError(f"unknown label: {payload.get('label')!r}")
-    CsvStore().set_label(payload, payload["label"], labelled_by="site")
+    CsvStore().set_label(payload, payload["label"], confirmed=True)
     return {"ok": True}
 
 

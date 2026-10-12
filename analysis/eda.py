@@ -71,16 +71,16 @@ def load_data():
 
 
 store = load_data()
-crta = store[store["labelled_by"] == "crta"]
-labels = store[store["labelled_by"].isin(["hand", "ui"])]
-llm = store[store["labelled_by"].str.startswith(("claude", "llm"))]
+crta = store[store["sample"] == "crta-examples"]
+labels = store[(store["confirmed"] == "yes") & (store["sample"] != "crta-examples")]
+llm = store[store["confirmed"] != "yes"]
 
 section("LOAD", gap="")
 print(f"store total       : {len(store)} labelled rows")
 print(
     f"  crta            : {len(crta)} outlet-rows, {crta['cluster_id'].nunique()} distinct headlines (verified)"
 )
-print(f"  hand / ui       : {len(labels)} rows (verified)")
+print(f"  confirmed by us : {len(labels)} rows (verified)")
 print(f"  llm             : {len(llm)} rows (NOT verified - the model's guesses)")
 
 

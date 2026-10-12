@@ -19,9 +19,10 @@ COLUMNS = [
     "model_version",
     "label",
     "comment",
-    "labelled_by",
+    "confirmed",
     "labelled_at",
     "cluster_id",
+    "sample",
 ]
 
 KEY = ["url", "headline", "outlet"]
@@ -62,15 +63,25 @@ class CsvStore:
             self.save(df)
         return len(new_rows)
 
-    def set_label(self, row, label: str, labelled_by: str, comment: str = "") -> None:
+    def set_label(
+        self, row, label: str, confirmed: bool = False, comment: str = ""
+    ) -> None:
         df = self.load()
         match = pd.Series(True, index=df.index)
         for column in KEY:
             match &= df[column] == row[column]
-        df.loc[match, ["label", "comment", "labelled_by", "labelled_at"]] = [
+        df.loc[match, ["label", "comment", "confirmed", "labelled_at"]] = [
             label,
             comment,
-            labelled_by,
+            "yes" if confirmed else "",
             datetime.now().isoformat(timespec="seconds"),
         ]
         self.save(df)
+
+    def set_sample(self, rows: list[dict], name: str) -> int:
+        df = self.load()
+        keys = {tuple(r[k] for k in KEY) for r in rows}
+        match = df[KEY].apply(tuple, axis=1).isin(keys)
+        df.loc[match, "sample"] = name
+        self.save(df)
+        return int(match.sum())

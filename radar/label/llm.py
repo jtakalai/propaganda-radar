@@ -109,14 +109,19 @@ def main():
     parser.add_argument(
         "--relabel",
         action="store_true",
-        help="relabel rows this script labelled before, instead of unlabelled rows",
+        help="relabel rows nobody has confirmed, instead of unlabelled rows",
+    )
+    parser.add_argument(
+        "--sample",
+        default=None,
+        help="tag the rows as a named evaluation sample, e.g. kurir-politika",
     )
     args = parser.parse_args()
 
     store = CsvStore()
     df = store.load()
     todo = (
-        df[df["labelled_by"] == "claude-code"]
+        df[(df["label"] != "") & (df["confirmed"] != "yes")]
         if args.relabel
         else df[df["label"] == ""]
     )
@@ -131,6 +136,9 @@ def main():
         f"labelling {len(todo)} headlines via claude CLI, batches of {args.batch_size} ..."
     )
     rows = list(todo.iterrows())
+    if args.sample:
+        tagged = store.set_sample([row for _, row in rows], args.sample)
+        print(f"tagged {tagged} rows as sample={args.sample}")
     total_cost = 0.0
     labelled = 0
 
@@ -155,7 +163,6 @@ def main():
             store.set_label(
                 row,
                 label,
-                labelled_by="claude-code",
                 comment=format_comment(c["reasoning"], probs),
             )
             labelled += 1

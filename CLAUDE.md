@@ -76,11 +76,12 @@ listed in `radar/store.py`.
 - `radar/` — the package. `collect/` `label/` `model/` are directories;
   `prepare.py` `evaluate.py` `web.py` `store.py` `config.py` are single modules
 - `data/processed/headlines.csv` — the one canonical dataset, via `radar/store.py`.
-  Row identity is `(url, headline, outlet)`; `labelled_by` carries provenance
-  and separates verified labels from the LLM's guesses
+  Row identity is `(url, headline, outlet)`. `confirmed` says whether a person
+  signed the label off; `sample` names the evaluation set a row was drawn for,
+  and is empty for the rows that were labelled because they looked interesting
 - `data/raw/` — immutable
 - `archive/crta/` — frozen. CRTA's 162 example rows are already in the store
-  (`labelled_by="crta"`); we aren't pulling from them again
+  (`sample="crta-examples"`); we aren't pulling from them again
 - no `scripts/`; every task is `python -m radar.<module>` behind a `make` target
 - `analysis/eda.py`
 

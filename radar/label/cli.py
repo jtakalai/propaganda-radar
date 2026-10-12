@@ -94,7 +94,7 @@ def main():
                     counts[label] = counts.get(label, 0) + 1
                     row = store_row(entry)
                     store.upsert([row])
-                    store.set_label(row, label, labelled_by="hand")
+                    store.set_label(row, label, confirmed=True)
                     break
                 print("  ? use 0-4, s, or q")
             print()
