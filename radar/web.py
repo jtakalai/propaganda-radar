@@ -10,6 +10,7 @@ from radar.config import LABELS, ROOT
 from radar.model.classifier import explain
 from radar.store import CsvStore
 
+
 WEB = ROOT / "web"
 DATA = WEB / "data.json"
 

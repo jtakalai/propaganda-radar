@@ -28,6 +28,7 @@ import pandas as pd
 from radar.model.classifier import prediction_columns
 from radar.store import CsvStore
 
+
 CRTA_EXAMPLES = Path(__file__).resolve().parent / "crta_examples.csv"
 
 

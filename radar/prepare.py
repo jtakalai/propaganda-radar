@@ -2,6 +2,7 @@
 
 import unicodedata
 
+
 _CYRILLIC_TO_FOLDED_LATIN = str.maketrans(
     {
         "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "ђ": "dj",

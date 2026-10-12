@@ -23,6 +23,7 @@ import urllib.request
 from collections import Counter
 from pathlib import Path
 
+
 # Serbian-language monthly reports. Slugs aren't consistent (most reuse the
 # English "<month>-manipulations" slug, February and July have Serbian-only
 # slugs) so this list is hand-checked against crta.plus/sr/... rather than

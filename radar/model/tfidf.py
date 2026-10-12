@@ -10,6 +10,7 @@ from radar.model.dataset import labelled
 from radar.prepare import normalise
 from radar.store import CsvStore
 
+
 VERSION = "rung2-tfidf"
 
 _model = None

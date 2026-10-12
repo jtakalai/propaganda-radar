@@ -16,6 +16,7 @@ import feedparser
 from radar.collect.rss import entry_date, entry_url
 from radar.config import HEADLINES, LLM_BATCH_PENDING
 
+
 FEED = "https://www.kurir.rs/rss/politika"
 OUTLET = "Kurir"
 SITEMAP_INDEX = "https://www.kurir.rs/sitemaps-v2/index.xml"

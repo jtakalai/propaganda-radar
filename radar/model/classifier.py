@@ -7,6 +7,7 @@ from radar.config import LABELS
 from radar.model.rules import fired_rules
 from radar.prepare import normalise
 
+
 VERSION = "rung1-rules"
 
 

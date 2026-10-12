@@ -9,6 +9,7 @@ import pandas as pd
 from radar.config import FIGURES, LABELS
 from radar.store import CsvStore
 
+
 pd.set_option("display.width", 120)
 pd.set_option("display.max_columns", None)
 

@@ -7,6 +7,7 @@ import subprocess
 from radar.config import LABELS
 from radar.store import CsvStore
 
+
 SYSTEM_PROMPT = """You classify Serbian news headlines for CRTA's
 manipulation-narrative categories (crta.plus):
 

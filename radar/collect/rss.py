@@ -11,6 +11,7 @@ import feedparser
 from radar.model.classifier import prediction_columns
 from radar.store import CsvStore, new_row
 
+
 FEEDS = [
     ("Kurir", "https://www.kurir.rs/rss/politika"),
 ]

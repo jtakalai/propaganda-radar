@@ -9,6 +9,7 @@ from radar.collect.rss import entry_date, entry_url
 from radar.model.classifier import prediction_columns
 from radar.store import CsvStore, new_row
 
+
 FEED = "https://www.kurir.rs/rss/politika"
 OUTLET = "Kurir"
 
