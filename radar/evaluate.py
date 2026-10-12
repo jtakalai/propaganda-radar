@@ -73,14 +73,13 @@ def main():
         r2 = (rows["rung2"] != "nothing").mean()
         print(f"  {outlet:<38}  {r1:.2f}   {r2:.2f}  (n={len(rows)})")
 
-    background = pd.read_csv(BACKGROUND_HEADLINES)["Naslov"]
-    rate = (background.apply(rung1_predict) != "nothing").mean()
+    background = pd.read_csv(BACKGROUND_HEADLINES)
+    politics = background[background["Kategorija"] == "politika"]["Naslov"]
+    rate = (politics.apply(rung1_predict) != "nothing").mean()
     print(
-        f"\nRung 1 flags {rate:.1%} of the {len(background)} unlabelled background headlines"
+        f"\nRung 1 flags {rate:.1%} of the {len(politics)} unlabelled politics headlines"
     )
-    print(
-        "  (not a false-positive rate - that file is pro-government tabloid politics, not a neutral pool)"
-    )
+    print("  (we only ever collect politics, so the other sections are not scored)")
 
 
 if __name__ == "__main__":
