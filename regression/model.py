@@ -15,7 +15,7 @@ def _stopword_label_tokenizer(stopwords: list[str]):
     return tokenizer
 
 
-def build_model(stopwords: list[str] | None = None) -> Pipeline:
+def build_vectorizer(stopwords: list[str] | None = None) -> TfidfVectorizer:
     vectorizer_options = {
         "ngram_range": (1, 2),
         "sublinear_tf": True,
@@ -25,15 +25,21 @@ def build_model(stopwords: list[str] | None = None) -> Pipeline:
         vectorizer_options["tokenizer"] = _stopword_label_tokenizer(stopwords)
         vectorizer_options["token_pattern"] = None
 
-    vectorizer = TfidfVectorizer(
-        **vectorizer_options,
-    )
+    return TfidfVectorizer(**vectorizer_options)
+
+
+def build_model(stopwords: list[str] | None = None) -> Pipeline:
     classifier = LogisticRegression(
         max_iter=2000,
         class_weight="balanced",
         random_state=42,
     )
-    return Pipeline([("tfidf", vectorizer), ("classifier", classifier)])
+    return Pipeline(
+        [
+            ("tfidf", build_vectorizer(stopwords)),
+            ("classifier", classifier),
+        ]
+    )
 
 
 def feature_names(model: Pipeline):
