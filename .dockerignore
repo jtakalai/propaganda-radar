@@ -1,0 +1,11 @@
+**/__pycache__
+venv
+.direnv
+.git
+data
+!data/processed/headlines.csv
+archive
+reports
+models
+docs
+analysis

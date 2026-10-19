@@ -89,6 +89,11 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="0.0.0.0 to accept connections from outside the container",
+    )
+    parser.add_argument(
         "--export",
         action="store_true",
         help="write web/data.json and exit, instead of serving",
@@ -100,9 +105,9 @@ def main():
         return
 
     server = ThreadingHTTPServer(
-        ("127.0.0.1", args.port), partial(Handler, directory=str(WEB))
+        (args.host, args.port), partial(Handler, directory=str(WEB))
     )
-    print(f"serving {WEB} on http://127.0.0.1:{args.port}  (ctrl-c to stop)")
+    print(f"serving {WEB} on http://{args.host}:{args.port}  (ctrl-c to stop)")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
