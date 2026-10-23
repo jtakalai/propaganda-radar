@@ -6,7 +6,7 @@ from collections import Counter
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from radar.config import FIGURES, LABELS
+from radar.config import CRTA_SAMPLE, FIGURES, LABELS
 from radar.store import CsvStore
 
 
@@ -72,8 +72,8 @@ def load_data():
 
 
 store = load_data()
-crta = store[store["sample"] == "crta-examples"]
-labels = store[(store["confirmed"] == "yes") & (store["sample"] != "crta-examples")]
+crta = store[store["sample"] == CRTA_SAMPLE]
+labels = store[(store["confirmed"] == "yes") & (store["sample"] != CRTA_SAMPLE)]
 llm = store[store["confirmed"] != "yes"]
 
 section("LOAD", gap="")

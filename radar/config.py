@@ -27,3 +27,5 @@ LABELS = [
 ]
 
 MANIPULATIONS = [label for label in LABELS if label != "nothing"]
+
+CRTA_SAMPLE = "crta-examples"
