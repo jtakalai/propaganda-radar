@@ -17,7 +17,7 @@ help:
 	@echo "  make export     re-render web/data.json after the store changes"
 
 setup:
-	$(PYTHON) -m venv $(VENV)
+	@[ "$$($(PYTHON_VENV) -V 2>&1)" = "$$($(PYTHON) -V)" ] || $(PYTHON) -m venv --clear $(VENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements-dev.txt
 
