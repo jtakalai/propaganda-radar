@@ -51,14 +51,7 @@ But the EDA resulted us being very much satisfied with our current plan and curr
 
 ## Modelling
 
-We applied all tools introduced during the course to this classification task. Good thing is, this is very textbook "sentiment analysis": given sentences, we are to classify them into 5 buckets. The following methods were used:
-* For encoding the headlines into embedding vectors:
-  * TF-IDF vectorizer
-  * Transformers
-* For classifying the vectors into label classes:
-  * Logistic regression
-  * Decision trees
-  * TPOT
+We applied all tools introduced during the course to this classification task. Good thing is, this is very textbook "sentiment analysis": given sentences, we are to classify them into 5 buckets. For encoding the headlines into embedding vectors, we used TF-IDF vectorizers and transformers. For classifying the vectors into label classes, we tried logistic regression, decision trees, and an "automated machine learning" library called [Tree-based Pipeline Optimization Tool (TPOT)](https://epistasislab.github.io/tpot/latest/), introduced in [week 6 exercises](https://courses.mooc.fi/org/uh-cs/courses/introduction-to-data-science/chapter-7/big-data-management#aec7a92f-00ee-4762-9f04-a83f810d5f3b).
 
 ### Results
 
@@ -108,7 +101,13 @@ Decision trees were introduced in [chapter 5](https://courses.mooc.fi/org/uh-cs/
 
 ## The app
 
-We present the headline classification results in a web app inspired by CRTA's monthly media manipulation reports. Users can specify a time period and check the number of headlines in each category. Labellers can verify AI-labelled headlines. We plan to add support for posting blog posts to the platform. Keywords important to determining a headline's category are highlighted.
+We present the headline classification results in a web app inspired by CRTA's monthly media manipulation reports. Users can specify a time period and check the number of headlines in each category.
+
+![Distilled results](./app-user-view.png)
+
+Labellers can verify AI-labelled headlines. We plan to add support for posting blog posts to the platform. Keywords important to determining a headline's category are highlighted.
+
+![Efficient manual review](./app-labeller-view.png)
 
 The frontend is built with Alpine.js, a lightweight JavaScript framework that enables dynamic updates without a build step. The app reads the data store live, providing real-time updates to the user interface. The backend is implemented using Python's built-in http package to minimise complexity.
 
