@@ -4,20 +4,20 @@ Skeleton. 5 pages max, PDF, not for CRTA. Numbers from 2026-09-30, rerun first.
 
 ## 1. Purpose
 
-Pro-government outlets dominate the Serbian media landscape and systematically push narratives that favour the ruling party. These outlets often wage smear campaigns against actors deemed hostile to the authorities. On the othe other hand, their coverage of the authorities is overwhelmingly positive.
+Pro-government outlets dominate the Serbian media landscape and systematically push narratives that favour the ruling party [1]. These outlets often wage smear campaigns against actors deemed hostile to the authorities [2]. On the other hand, their coverage of the authorities is overwhelmingly positive.
 
-The CRTA watchdog organisation monitors the front pages of pro-government media for such manipulations and publishes monthly media manipulation reports. CRTA identifies four categories of media manipulation in Serbia:
+The CRTA watchdog organisation monitors the front pages of pro-government media for such manipulations and publishes monthly media manipulation reports [3]. CRTA identifies four categories of media manipulation in Serbia:
 
 1. Vilifying opponents: Coverage shaming the student movement, portraying them as criminals or as wanting to destroy Serbia
 2. Vilifying neighbours: Coverage painting neighbouring countries and their leaders as part of a conspiracy against Serbia
 3. Personality cult: Coverage praising former president Aleksandar Vučić, framing him as an indispensable political mastermind and his achievements as historic
 4. Vilifying the EU: Anti-EU content portraying it as unfriendly to Serbia and opposed to its interests.
 
-While these reports successfully identify patterns in Serbian pro-regime media, they are published too infrequently, and no report has been published since August. Moreover, the headlines are hand-labelled, which is labour-intensive and time-consuming. Additionally, coverage is limited to the front pages and does not extend to the inner pages.
+While these reports successfully identify patterns in Serbian pro-regime media, they are published too infrequently, and no report has been published since August [3]. Moreover, the headlines appear to be hand-labelled, which is labour-intensive and time-consuming. Additionally, coverage is limited to the front pages and does not extend to the inner pages.
 
 This project aims to develop a web service that automatically identifies and categorises headlines on pro-regime outlet websites using classification algorithms. This approach would enable real-time narrative monitoring and expand the scope of analysis. However, because machine learning models may incorrectly flag some headlines, CRTA’s reports should remain the main source of truth. 
 
-The main users of this service would be watchdog organisations in Serbia and foreign policymakers. Since Serbia is due to have presidential elections this year, the project could also be used for monitoring election integrity during the campaign period.
+The main users of this service would be watchdog organisations in Serbia and foreign policymakers. Since Serbia is due to hold presidential elections this year due to Vučić's resignation, the project could also be used to monitor election integrity during the campaign period.
 
 # 2. Data
 
@@ -74,8 +74,7 @@ Five short paragraphs, the five the guidelines ask for.
 
 We have delivered an end-to-end data science project covering all stages of the data lifecycle. By creating a data science project canvas, we learned how to plan a project. Scraping multiple websites taught us how to organise data from different sources. During the preprocessing and modelling stage, we learned how to work with textual data. Finally, through the spotlight presentation, we enhanced our ability to convey results to stakeholders efficiently.
 
-## While writing
-
-- Budget adds to 5.5. Cut 2 and 3.
-- Write 4 and 7 first.
-
+## References 
+[1] Media Pluralism Monitor 2026, https://cmpf.eui.eu/country/serbia-2026/
+[2] CRTA Media and Information Space Page, https://crta.plus/media-information-space/
+[3] CRTA Front Page Manipulations Overview, https://crta.plus/media-information-space/front-page-manipulations/
