@@ -56,12 +56,11 @@ A mixture of the Latin and Cyrillic scripts was used in the headlines. All headl
   repeated across outlets, so the dedupe removes them before groups() runs.
   All 369 rows end up their own group. Near-duplicate leakage is unhandled.
 
-## 8. The app [0.75 p]
+## 8. The app
 
-- Alpine, no build step, reads the store live.
-- Dashboard, relabel, fetch. Blog-post draft button planned.
-- Still runs rung 1: explain() names the rule that fired. Rung 2 would flag
-  with nothing to show. Needs a linear explain() first.
+We present the headline classification results in a web app inspired by CRTA's monthly media manipulation reports. Users can specify a time period and check the number of headlines in each category. Labellers can verify AI-labelled headlines. We plan to add support for posting blog posts to the platform. Keywords important to determining a headline's category are highlighted.
+
+The frontend is built with Alpine.js, a lightweight JavaScript framework that enables dynamic updates without a build step. The app reads the data store live, providing real-time updates to the user interface. The backend is implemented using Python's built-in http package to minimise complexity.
 
 ## 9. Canvas reflection [0.75 p]
 
@@ -71,7 +70,7 @@ Five short paragraphs, the five the guidelines ask for.
 - Didn't: 80 positives, no held-out split, personality_cult 0.08, CRTA never
   replied.
 
-## 10. Learning outcomes [0.25 p]
+## 10. Learning outcomes
 
 We have delivered an end-to-end data science project covering all stages of the data lifecycle. By creating a data science project canvas, we learned how to plan a project. Scraping multiple websites taught us how to organise data from different sources. During the preprocessing and modelling stage, we learned how to work with textual data. Finally, through the spotlight presentation, we enhanced our ability to convey results to stakeholders efficiently.
 
