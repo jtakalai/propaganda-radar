@@ -15,7 +15,9 @@ The CRTA watchdog organisation monitors the front pages of pro-government media 
 
 While these reports successfully identify patterns in Serbian pro-regime media, they are published too infrequently, and no report has been published since August. Moreover, the headlines are hand-labelled, which is labour-intensive and time-consuming. Additionally, coverage is limited to the front pages and does not extend to the inner pages.
 
-This project aims to develop a machine learning model that automatically identifies and categorises headlines on pro-regime outlet websites using classification algorithms. This approach would enable real-time narrative monitoring and expand the scope of analysis. However, because machine learning models may incorrectly flag some headlines, CRTA’s reports should remain the main source of truth.
+This project aims to develop a web service that automatically identifies and categorises headlines on pro-regime outlet websites using classification algorithms. This approach would enable real-time narrative monitoring and expand the scope of analysis. However, because machine learning models may incorrectly flag some headlines, CRTA’s reports should remain the main source of truth. 
+
+The main users of this service would be watchdog organisations in Serbia and foreign policymakers. Since Serbia is due to have presidential elections this year, the project could also be used for monitoring election integrity during the campaign period.
 
 # Data
 
@@ -23,7 +25,7 @@ The headlines for training machine learning models were collected by scraping th
 
 ## 3. Preprocessing [0.5 p]
 
-A mixture of the latin and cyrilic scripts was used in the headlines. All headlines were first normalized to latin and diactric folding was applied.
+A mixture of the Latin and Cyrillic scripts was used in the headlines. All headlines were first normalised to Latin, and diacritic folding was applied.
 
 - Cyrillic and Latin mixed. Normalise both plus diacritic-folded.
 - Row identity (url, headline, outlet).
