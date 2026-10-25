@@ -23,12 +23,9 @@ The main users of this service would be watchdog organisations in Serbia and for
 
 The headlines for training machine learning models were collected by scraping the politics sections of [Kurir](kurir.rs) and [Informer](informer.rs). Both web pages and RSS feeds were scraped. The data was labelled using Claude Sonnet 5.5, and all labels were verified by a Serbian speaker. A small number of labelled example headlines were collected from CRTA’s website. The dataset contains approximately 1300 headlines.
 
-## 3. Preprocessing [0.5 p]
+## 3. Preprocessing
 
-A mixture of the Latin and Cyrillic scripts was used in the headlines. All headlines were first normalised to Latin, and diacritic folding was applied.
-
-- Cyrillic and Latin mixed. Normalise both plus diacritic-folded.
-- Row identity (url, headline, outlet).
+A mixture of the Latin and Cyrillic scripts was used in the headlines. All headlines were first normalised to Latin, and diacritic folding was applied. Next, stopwords were removed prior. However, stopword removal was skipped for the model based on Sentence Transformer embeddings.
 
 ## 4. Labelling [1 p]
 
