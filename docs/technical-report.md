@@ -19,13 +19,13 @@ This project aims to develop a web service that automatically identifies and cat
 
 The main users of this service would be watchdog organisations in Serbia and foreign policymakers. Since Serbia is due to have presidential elections this year, the project could also be used for monitoring election integrity during the campaign period.
 
-# Data
+# 2. Data
 
 The headlines for training machine learning models were collected by scraping the politics sections of [Kurir](kurir.rs) and [Informer](informer.rs) portals. Both web pages and RSS feeds were scraped. The data was labelled using Claude Sonnet 5.5, and all labels were verified by a Serbian speaker. A small number of labelled example headlines were collected from CRTA’s website. The dataset contains approximately 1300 headlines.
 
 ## 3. Preprocessing
 
-A mixture of the Latin and Cyrillic scripts was used in the headlines. All headlines were first normalised to Latin, and diacritic folding was applied. Next, stopwords were removed prior. However, stopword removal was skipped for the model based on Sentence Transformer embeddings.
+A mixture of the Latin and Cyrillic scripts was used in the headlines. All headlines were first normalised to Latin, and diacritic folding was applied. Next, stopwords were removed. However, stopword removal was skipped for the model based on Sentence Transformer embeddings.
 
 ## 4. Labelling [1 p]
 
@@ -73,7 +73,7 @@ Five short paragraphs, the five the guidelines ask for.
 
 ## 10. Learning outcomes [0.25 p]
 
-- Graded. One line each.
+We have delivered an end-to-end data science project covering all stages of the data lifecycle. By creating a data science project canvas, we learned how to plan a project. Scraping multiple websites taught us how to organise data from different sources. During the preprocessing and modelling stage, we learned how to work with textual data. Finally, through the spotlight presentation, we enhanced our ability to convey results to stakeholders efficiently.
 
 ## While writing
 
