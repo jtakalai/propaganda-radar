@@ -2,18 +2,28 @@
 
 Skeleton. 5 pages max, PDF, not for CRTA. Numbers from 2026-09-30, rerun first.
 
-## 1. Purpose [0.5 p]
+## 1. Purpose
 
-- CRTA hand-codes a few outlets, hundreds go unread. We cover the rest.
-- Categories are CRTA's. Cite the page.
-- Ethics: flag, not verdict. Human in the loop.
+Pro-government outlets dominate the Serbian media landscape and systematically push narratives that favour the ruling party. These outlets often wage smear campaigns against actors deemed hostile to the authorities. On the othe other hand, their coverage of the authorities is overwhelmingly positive.
 
-## 2. Data [0.5 p]
+The CRTA watchdog organisation monitors the front pages of pro-government media for such manipulations and publishes monthly media manipulation reports. CRTA identifies four categories of media manipulation in Serbia:
 
-- 162 frozen CRTA examples, rest by RSS. Scraping etiquette.
-- 554 rows, 369 unique, 455 labelled. Kurir is 414 of 554.
+1. Vilifying opponents: Coverage shaming the student movement, portraying them as criminals or as wanting to destroy Serbia
+2. Vilifying neighbours: Coverage painting neighbouring countries and their leaders as part of a conspiracy against Serbia
+3. Personality cult: Coverage praising former president Aleksandar Vučić, framing him as an indispensable political mastermind and his achievements as historic
+4. Vilifying the EU: Anti-EU content portraying it as unfriendly to Serbia and opposed to its interests.
+
+While these reports successfully identify patterns in Serbian pro-regime media, they are published too infrequently, and no report has been published since August. Moreover, the headlines are hand-labelled, which is labour-intensive and time-consuming. Additionally, coverage is limited to the front pages and does not extend to the inner pages.
+
+This project aims to develop a machine learning model that automatically identifies and categorises headlines on pro-regime outlet websites using classification algorithms. This approach would enable real-time narrative monitoring and expand the scope of analysis. However, because machine learning models may incorrectly flag some headlines, CRTA’s reports should remain the main source of truth.
+
+# Data
+
+The headlines for training machine learning models were collected by scraping the politics sections of [Kurir](kurir.rs) and [Informer](informer.rs). Both web pages and RSS feeds were scraped. The data was labelled using Claude Sonnet 5.5, and all labels were verified by a Serbian speaker. A small number of labelled example headlines were collected from CRTA’s website. The dataset contains approximately 1300 headlines.
 
 ## 3. Preprocessing [0.5 p]
+
+A mixture of the latin and cyrilic scripts was used in the headlines. All headlines were first normalized to latin and diactric folding was applied.
 
 - Cyrillic and Latin mixed. Normalise both plus diacritic-folded.
 - Row identity (url, headline, outlet).
@@ -70,3 +80,4 @@ Five short paragraphs, the five the guidelines ask for.
 
 - Budget adds to 5.5. Cut 2 and 3.
 - Write 4 and 7 first.
+
