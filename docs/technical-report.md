@@ -1,3 +1,18 @@
+---
+papersize: a4
+documentclass: article
+header-includes:
+    - \usepackage{multicol}
+    - \usepackage{float}
+    - \floatplacement{figure}{H}
+    - \newcommand{\hideFromPandoc}[1]{#1}
+    - \hideFromPandoc{
+        \let\Begin\begin
+        \let\End\end
+      }
+
+...
+
 # Technical report: Propaganda Radar
 
 Pro-government outlets dominate the Serbian media landscape and systematically push narratives that favour the ruling party [1]. These outlets often wage smear campaigns against actors deemed hostile to the authorities [2]. On the other hand, their coverage of the authorities is overwhelmingly positive.
@@ -25,15 +40,10 @@ The dataset is stored as a CSV file and contains approximately 1300 headlines. T
 
 A mixture of the Latin and Cyrillic scripts was used in the headlines. All headlines were first normalised to Latin, and diacritic folding was applied. Next, stopwords were removed. However, stopword removal was skipped for the model based on Sentence Transformer embeddings. Finally, the headlines were deduplicated.
 
-### Labelling
-
-- crta 162, llm 287, hand 6.
-- 84 of 455 labelled rows are "nothing". Real base rate is 2%.
-- 7 of 27 CRTA Kurir rows are multi-label. We forced single.
-
 ## Exploratory Data Analysis (EDA)
 
 We didn't receive a data set from CRTA in time for the project, but just from the headlines we labeled ourselves, we could see that there was at least some coverage of all of the labels, and also the share of "nothing" labels wasn't too high: this meant that the categories selected _a priori_ do in fact represent over 80% of the data.
+
 
 | label                |   count |    % |
 |:---------------------|--------:|-----:|
@@ -42,6 +52,9 @@ We didn't receive a data set from CRTA in time for the project, but just from th
 | vilifying_eu         |      19 |  4.2 |
 | vilifying_neighbours |      69 | 15.2 |
 | vilifying_opponents  |     245 | 53.8 |
+
+Table: Dataset breakdown by label
+
 
 This meant we didn't need to add more categories but could safely just use those that we planned. Of course since they came from CRTA, we knew they were "good" in the sense that they were extensively battle-tested in manual processes. What we were unsure about was if they'd be representative of shorter time frame news-feed: some of the labels could be very seasonal or otherwise rarely used just when we would be sampling.
 
@@ -55,6 +68,7 @@ We applied all tools introduced during the course to this classification task. G
 
 ### Results
 
+
 | model                             |   accuracy |   precision |   recall |   f1_score |
 |:----------------------------------|-----------:|------------:|---------:|-----------:|
 | Transformer + TPOT search         |      0.788 |       0.670 |    0.738 |      0.696 |
@@ -65,7 +79,10 @@ We applied all tools introduced during the course to this classification task. G
 | Decision tree                     |      0.614 |       0.384 |    0.356 |      0.355 |
 | Majority baseline                 |      0.538 |       0.108 |    0.200 |      0.140 |
 
+Table: Performance metrics for different models
+
 ![Diagram](./scores_diagram.png)
+
 
 There were two kinds of classification ideas: logistic regression and decision trees. TPOT would also produce a pipeline that ended with `SGDClassifier`, a linear classifier like logistic regression with Stochastic Gradient Descent training. Curiously, it would lose to simple `LogisticRegression` with TF-IDF and just barely inch ahead when using the `SentenceTransformer`.
 
@@ -87,27 +104,37 @@ Transformers were introduced in [chapter 5](https://courses.mooc.fi/org/uh-cs/co
 
 While the transformer produces much richer 1024-dimensional vectors than the simple TF-IDF score, those vectors are also quite impossible to interpret: best we can do is look how our labelled classes are spread in the embedding space:
 
+
 ![2D projection of the transformer embeddings](./transformer_embeddings.png)
+
 
 And it indeed looks very good! Except for the `vilifying_eu` label, the other classes seem neatly linearly separable; indeed, simple linear regression gets them very nicely separated:
 
-![Confusion matrix for transformer embeddings + logistic regression](./transformer-matrix.png)
+
+![Confusion matrix for transformer embeddings + logistic regression](./transformer-matrix.png){width=50%}
+
 
 ### Decision trees
 
 Decision trees were introduced in [chapter 5](https://courses.mooc.fi/org/uh-cs/courses/introduction-to-data-science/chapter-5/predictive-models#ace04a7f-33c1-49ee-81c1-3fdfd5a96c79). The scores for the decision tree model are not the best, but its advantage is interpretability. At the top of the tree we already see two common words: Vučić, and blokaderi (a derogatory term for political opposition and demonstrators).
 
+
 ![Top of the decision tree](./decision-tree.png)
+
 
 ## The app
 
 We present the headline classification results in a web app inspired by CRTA's monthly media manipulation reports. Users can specify a time period and check the number of headlines in each category.
 
+
 ![Distilled results](./app-user-view.png)
+
 
 Labellers can verify AI-labelled headlines. We plan to add support for posting blog posts to the platform. Keywords important to determining a headline's category are highlighted.
 
+
 ![Efficient manual review](./app-labeller-view.png)
+
 
 The frontend is built with Alpine.js, a lightweight JavaScript framework that enables dynamic updates without a build step. The app reads the data store live, providing real-time updates to the user interface. The backend is implemented using Python's built-in http package to minimise complexity.
 
@@ -119,7 +146,11 @@ Reflecting on the process: the initial plan held very well. Everything in data c
 
 We hope the tool can be useful to political observers, later elsewhere, since it should be straightforward to adapt to other countries and other pivotal times.
 
+
 ## References
+
 [1] Media Pluralism Monitor 2026, https://cmpf.eui.eu/country/serbia-2026/
+
 [2] CRTA Media and Information Space Page, https://crta.plus/media-information-space/
+
 [3] CRTA Front Page Manipulations Overview, https://crta.plus/media-information-space/front-page-manipulations/
